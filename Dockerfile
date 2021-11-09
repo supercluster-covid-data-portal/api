@@ -48,6 +48,10 @@ COPY --from=builder \
   $APP_HOME
 
 COPY --from=builder \
+  /usr/configs \
+  $APP_HOME/configs
+
+COPY --from=builder \
   /usr/dist \
   $APP_HOME/dist
 
