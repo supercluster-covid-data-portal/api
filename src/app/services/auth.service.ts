@@ -1,0 +1,151 @@
+/*
+ * Copyright (c) 2021 The Ontario Institute for Cancer Research. All rights reserved
+ *
+ * This program and the accompanying materials are made available under the terms of
+ * the GNU Affero General Public License v3.0. You should have received a copy of the
+ * GNU Affero General Public License along with this program.
+ *  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+ * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+ * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+import jwtDecode from 'jwt-decode';
+import jsonwebtoken, { Algorithm } from 'jsonwebtoken';
+import JwksRsa from 'jwks-rsa';
+import urlJoin from 'url-join';
+import axios, { AxiosError, AxiosResponse } from 'axios';
+
+import {
+  TokenResponseData,
+  WalletJwtData,
+  WalletJwtHeaderData,
+  WalletUser,
+  WalletUserInfoResponse,
+} from './types';
+import getAppConfig from '../../config/global';
+import logger from '../../logger';
+
+let kid: string;
+let pubkey: string;
+
+const fetchPublicKey: (keyId: string) => Promise<string> = async (keyId) => {
+  const config = getAppConfig();
+  const client = JwksRsa({
+    jwksUri: config.auth.jwksUri,
+  });
+
+  const key = await client.getSigningKey(keyId);
+  return key.getPublicKey();
+};
+
+export const validateJwt: (jwt: string) => Promise<boolean> = async (jwt) => {
+  const jwtHeader: WalletJwtHeaderData = jwtDecode(jwt, { header: true }); // header: true will return ONLY header info
+  const kidFromJwt = jwtHeader.kid;
+  const alg = jwtHeader.alg;
+
+  // if existing kid does not match incoming from jwt, update
+  if (kidFromJwt !== kid) {
+    logger.info('Resetting kid from jwt...');
+    const newPubKey = await fetchPublicKey(kidFromJwt); // need error handling
+    kid = kidFromJwt;
+    pubkey = newPubKey;
+  }
+  return verifyJwt(pubkey, jwt, alg);
+};
+
+const verifyJwt: (jwtString: string, publicKey: string, alg: Algorithm) => boolean = (
+  publicKey,
+  jwtString,
+  alg,
+) => {
+  try {
+    if (!jwtString || !publicKey) {
+      return false;
+    } else {
+      return !!jsonwebtoken.verify(jwtString, publicKey, { algorithms: [alg] });
+    }
+  } catch (err) {
+    return false;
+  }
+};
+
+export const extractUser: (jwtData: WalletJwtData) => WalletUser = (jwtData) => {
+  return {
+    name: jwtData.name,
+    email: jwtData.email,
+    id: jwtData.sub,
+  };
+};
+
+export const fetchAuthToken: (
+  authCode: string,
+) => Promise<{ idToken: string; accessToken: string }> = async (authCode) => {
+  const config = getAppConfig();
+  const loginUrl = new URL(urlJoin(config.auth.apiRootUrl as string, 'oauth/token'));
+  loginUrl.searchParams.append('grant_type', 'authorization_code');
+  loginUrl.searchParams.append('code', authCode);
+
+  const encoded = Buffer.from(`${config.auth.clientId}:${config.auth.clientSecret}`).toString(
+    'base64',
+  );
+  const tokenResponse: TokenResponseData = await axios
+    .post(
+      loginUrl.href,
+      {},
+      {
+        headers: {
+          Authorization: `Basic ${encoded}`,
+        },
+      },
+    )
+    .then(async (res: AxiosResponse<any, any>) => {
+      if (res.status === 200) {
+        return res.data;
+      }
+    })
+    .catch((err: AxiosError) => {
+      logger.warn('Token fetch failed, unable to login.', err);
+    });
+
+  const idToken = tokenResponse.id_token;
+  const accessToken = tokenResponse.access_token;
+  const validIdToken = await validateJwt(idToken);
+  const validAccessToken = await validateJwt(accessToken);
+
+  if (!(validIdToken && validAccessToken)) {
+    throw new Error('Invalid JWT!!');
+  }
+  return { idToken, accessToken };
+};
+
+export const fetchUserInfo = async (token: string) => {
+  const config = getAppConfig();
+  const userResult: WalletUserInfoResponse = await axios
+    .get(urlJoin(config.auth.apiRootUrl as string, 'api/v1/users/me'), {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then((res: AxiosResponse) => {
+      // response is always 200, but returns authenticated: false if auth is not present/is expired
+      if (res.data.authenticated) {
+        return res.data;
+      }
+      throw new Error('Not authenticated');
+    })
+    .catch((err: AxiosError) => logger.warn('Error fetching user info'));
+
+  return {
+    name: userResult.user.fullname,
+    email: userResult.user.linkedAccounts[0]?.email || '',
+    id: userResult.user.id,
+  } as WalletUser;
+};
