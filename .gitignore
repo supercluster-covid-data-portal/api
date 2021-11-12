@@ -1,8 +1,9 @@
 node_modules/
-build/
+dist/
 logs/
 *.log
 
 src/app/.notes
 .DS_Store
 .env
+

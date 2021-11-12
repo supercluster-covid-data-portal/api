@@ -16,11 +16,11 @@ app.set('json spaces', 4);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(cors());
 
 // Handle logs in console during development
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
-  app.use(cors());
 }
 
 // Handle security and origin in production

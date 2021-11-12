@@ -6,7 +6,7 @@ import { Router } from 'express';
 import { BASE_ENDPOINT } from './constants/endpoint';
 import app from './server';
 
-const port = Number(process.env.PORT || 8080);
+const port = Number(process.env.PORT || 4000);
 
 Arranger().then((arrangerRouter: Router) => {
   app.use(BASE_ENDPOINT, arrangerRouter);
