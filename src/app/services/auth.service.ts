@@ -32,6 +32,7 @@ import {
 } from './types';
 import getAppConfig from '../../config/global';
 import logger from '../../logger';
+import { get } from 'lodash';
 
 let kid: string;
 let pubkey: string;
@@ -146,10 +147,8 @@ export const fetchUserInfo = async (token: string) => {
           const { user } = res.data;
           return {
             name: user.fullname || '',
-            email:
-              Array.isArray(user.linkedAccounts) && user.linkedAccounts.length
-                ? user.linkedAccounts[0].email
-                : '',
+            // if email will be used in frontend, likely better to specify by issuer
+            email: Array.isArray(user.linkedAccounts) && get(user, 'linkedAccounts[0].email', ''),
             id: user.id || '',
           } as WalletUser;
         }
