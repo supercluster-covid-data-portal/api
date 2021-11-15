@@ -83,9 +83,9 @@ const verifyJwt: (jwtString: string, publicKey: string, alg: Algorithm) => boole
 
 export const extractUser: (jwtData: WalletJwtData) => WalletUser = (jwtData) => {
   return {
-    name: jwtData.name,
-    email: jwtData.email,
-    id: jwtData.sub,
+    name: jwtData.name || '',
+    email: jwtData.email || '',
+    id: jwtData.sub || '',
   };
 };
 
