@@ -46,6 +46,8 @@ const fetchPublicKey: (keyId: string) => Promise<string> = async (keyId) => {
   return key.getPublicKey();
 };
 
+// extract jwt header info to keep auth service kid + pubkey up-to-date with external authorization server settings
+// returns a boolean for validity
 export const validateJwt: (jwt: string) => Promise<boolean> = async (jwt) => {
   const jwtHeader: WalletJwtHeaderData = jwtDecode(jwt, { header: true }); // header: true will return ONLY header info
   const kidFromJwt = jwtHeader.kid;
@@ -61,6 +63,7 @@ export const validateJwt: (jwt: string) => Promise<boolean> = async (jwt) => {
   return verifyJwt(pubkey, jwt, alg);
 };
 
+// verify jwt against auth service public key
 const verifyJwt: (jwtString: string, publicKey: string, alg: Algorithm) => boolean = (
   publicKey,
   jwtString,
@@ -110,6 +113,7 @@ export const fetchAuthToken: (
       if (res.status === 200) {
         return res.data;
       }
+      throw new Error(`Auth token response is not OK: ${res.status}`);
     })
     .catch((err: AxiosError) => {
       logger.warn('Token fetch failed, unable to login.', err);
@@ -126,9 +130,10 @@ export const fetchAuthToken: (
   return { idToken, accessToken };
 };
 
+// authenticated fetch for user data from userinfo endpoint
 export const fetchUserInfo = async (token: string) => {
   const config = getAppConfig();
-  const userResult: WalletUserInfoResponse = await axios
+  const userResult = await axios
     .get(urlJoin(config.auth.apiRootUrl as string, 'api/v1/users/me'), {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -137,15 +142,25 @@ export const fetchUserInfo = async (token: string) => {
     .then((res: AxiosResponse) => {
       // response is always 200, but returns authenticated: false if auth is not present/is expired
       if (res.data.authenticated) {
-        return res.data;
+        if (res.data.user) {
+          const { user } = res.data;
+          return {
+            name: user.fullname || '',
+            email:
+              Array.isArray(user.linkedAccounts) && user.linkedAccounts.length
+                ? user.linkedAccounts[0].email
+                : '',
+            id: user.id || '',
+          } as WalletUser;
+        }
+        throw new Error('Invalid user info response');
       }
-      throw new Error('Not authenticated');
+      throw new Error('Not authenticated, cannot fetch user info');
     })
-    .catch((err: AxiosError) => logger.warn('Error fetching user info'));
+    .catch((err: AxiosError) => {
+      logger.warn('Error fetching user info');
+      return err;
+    });
 
-  return {
-    name: userResult.user.fullname,
-    email: userResult.user.linkedAccounts[0]?.email || '',
-    id: userResult.user.id,
-  } as WalletUser;
+  return userResult;
 };
