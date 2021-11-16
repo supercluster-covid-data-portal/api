@@ -16,6 +16,8 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+import urlJoin from 'url-join';
+import { JWKS_ENDPOINT } from '../constants/endpoint';
 
 interface AppConfig {
   auth: {
@@ -34,7 +36,7 @@ interface AppConfig {
 const getAppConfig: () => AppConfig = () => ({
   auth: {
     apiRootUrl: process.env.AUTH_API_ROOT || 'http://localhost:8080',
-    jwksUri: process.env.JWKS_URI || '',
+    jwksUri: process.env.AUTH_API_ROOT ? urlJoin(process.env.AUTH_API_ROOT, JWKS_ENDPOINT) : '',
     clientId: process.env.AUTH_CLIENT_ID || '',
     clientSecret: process.env.AUTH_CLIENT_SECRET || '',
     sessionDuration: Number(process.env.AUTH_SESSION_DURATION) || 1800000,

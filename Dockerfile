@@ -38,6 +38,12 @@ ENV APP_HOME=/app
 ENV APP_USER=node
 ENV PORT=4000
 
+# temp env settings until helm chart is migrated to generic version
+ENV AUTH_API_ROOT=https://wallet.staging.dnastack.com
+ENV AUTH_SESSION_TOKEN_KEY=wallet-session-token
+ENV UI_ROOT_URL=https://ui.dev.supercluster.cancercollaboratory.org
+ENV AUTH_REDIRECT_URI=https://ui.dev.supercluster.cancercollaboratory.org/logged-in
+
 WORKDIR $APP_HOME
 
 USER $APP_USER
