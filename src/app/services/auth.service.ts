@@ -23,13 +23,7 @@ import JwksRsa from 'jwks-rsa';
 import urlJoin from 'url-join';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 
-import {
-  TokenResponseData,
-  WalletJwtData,
-  WalletJwtHeaderData,
-  WalletUser,
-  WalletUserInfoResponse,
-} from './types';
+import { TokenResponseData, WalletJwtData, WalletJwtHeaderData, WalletUser } from './types';
 import getAppConfig from '../../config/global';
 import logger from '../../logger';
 import { get } from 'lodash';
@@ -38,7 +32,7 @@ let kid: string;
 let pubkey: string;
 
 const fetchPublicKey: (keyId: string) => Promise<string> = async (keyId) => {
-  const config = getAppConfig();
+  const config = await getAppConfig();
   const client = JwksRsa({
     jwksUri: config.auth.jwksUri,
   });
@@ -92,7 +86,7 @@ export const extractUser: (jwtData: WalletJwtData) => WalletUser = (jwtData) => 
 export const fetchAuthToken: (
   authCode: string,
 ) => Promise<{ idToken: string; accessToken: string }> = async (authCode) => {
-  const config = getAppConfig();
+  const config = await getAppConfig();
   const loginUrl = new URL(urlJoin(config.auth.apiRootUrl as string, 'oauth/token'));
   loginUrl.searchParams.append('grant_type', 'authorization_code');
   loginUrl.searchParams.append('code', authCode);
@@ -133,7 +127,7 @@ export const fetchAuthToken: (
 
 // authenticated fetch for user data from userinfo endpoint
 export const fetchUserInfo = async (token: string) => {
-  const config = getAppConfig();
+  const config = await getAppConfig();
   const userResult = await axios
     .get(urlJoin(config.auth.apiRootUrl as string, 'api/v1/users/me'), {
       headers: {

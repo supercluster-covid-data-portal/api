@@ -16,8 +16,11 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+import * as dotenv from 'dotenv';
 import urlJoin from 'url-join';
 import { JWKS_ENDPOINT } from '../constants/endpoint';
+import logger from '../logger';
+import * as vault from './vault';
 
 interface AppConfig {
   auth: {
@@ -32,19 +35,61 @@ interface AppConfig {
     rootUrl: string;
   };
 }
+let config: AppConfig | undefined = undefined;
 
-const getAppConfig: () => AppConfig = () => ({
-  auth: {
-    apiRootUrl: process.env.AUTH_API_ROOT || 'http://localhost:8080',
-    jwksUri: process.env.AUTH_API_ROOT ? urlJoin(process.env.AUTH_API_ROOT, JWKS_ENDPOINT) : '',
-    clientId: process.env.AUTH_CLIENT_ID || '',
-    clientSecret: process.env.AUTH_CLIENT_SECRET || '',
-    sessionDuration: Number(process.env.AUTH_SESSION_DURATION) || 1800000,
-    sessionTokenKey: process.env.AUTH_SESSION_TOKEN_KEY || '',
-  },
-  ui: {
-    rootUrl: process.env.UI_ROOT_URL || 'http://localhost:3000',
-  },
-});
+const loadVaultSecrets = async () => {
+  const vaultEnabled = process.env.VAULT_ENABLED === 'true';
+  let secrets: any = {};
+
+  /** Vault */
+  if (vaultEnabled) {
+    if (process.env.VAULT_ENABLED && process.env.VAULT_ENABLED === 'true') {
+      if (!process.env.VAULT_SECRETS_PATH) {
+        logger.error('Path to secrets not specified but vault is enabled');
+        throw new Error('Path to secrets not specified but vault is enabled');
+      }
+      try {
+        secrets = await vault.loadSecret(process.env.VAULT_SECRETS_PATH);
+      } catch (err) {
+        logger.error('Failed to load secrets from vault.');
+        throw new Error('Failed to load secrets from vault.');
+      }
+    }
+  }
+  return secrets;
+};
+
+const buildAppConfig = async (secrets: any): Promise<AppConfig> => {
+  logger.info('Building app config...');
+  config = {
+    auth: {
+      apiRootUrl: process.env.AUTH_API_ROOT || 'http://localhost:8080',
+      jwksUri: process.env.AUTH_API_ROOT ? urlJoin(process.env.AUTH_API_ROOT, JWKS_ENDPOINT) : '',
+      clientId: process.env.AUTH_CLIENT_ID || '',
+      clientSecret: secrets.AUTH_CLIENT_SECRET || process.env.AUTH_CLIENT_SECRET || '',
+      sessionDuration: Number(process.env.AUTH_SESSION_DURATION) || 1800000,
+      sessionTokenKey: process.env.AUTH_SESSION_TOKEN_KEY || '',
+    },
+    ui: {
+      rootUrl: process.env.UI_ROOT_URL || 'http://localhost:3000',
+    },
+  };
+  return config;
+};
+
+const getAppConfig = async (envFile?: string): Promise<AppConfig> => {
+  if (config != undefined) {
+    return config;
+  }
+  if (envFile) {
+    dotenv.config({
+      path: envFile,
+    });
+  } else {
+    dotenv.config();
+  }
+  const secrets = await loadVaultSecrets();
+  return buildAppConfig(secrets);
+};
 
 export default getAppConfig;

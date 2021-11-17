@@ -25,8 +25,8 @@ import { extractUser, fetchAuthToken, fetchUserInfo } from '../services/auth.ser
 
 export const router: Router = Router();
 
-router.use((req: Request, res: Response, next: NextFunction) => {
-  const config = getAppConfig();
+router.use(async (req: Request, res: Response, next: NextFunction) => {
+  const config = await getAppConfig();
 
   res.header('Access-Control-Allow-Origin', config.ui.rootUrl);
   res.header('Access-Control-Allow-Header', 'Content-Type');
@@ -44,7 +44,7 @@ router.post(`${AUTH_ENDPOINT}/token`, async (req: Request, res: Response) => {
 
   const tokens = await fetchAuthToken(code);
   if (tokens.accessToken && tokens.idToken) {
-    const config = getAppConfig();
+    const config = await getAppConfig();
     const domain = new URL(config.ui.rootUrl as string);
     const cookieConfig: CookieOptions = {
       sameSite: 'strict',
@@ -64,7 +64,7 @@ router.post(`${AUTH_ENDPOINT}/token`, async (req: Request, res: Response) => {
 });
 
 router.get(`${AUTH_ENDPOINT}/user-info`, async (req: Request, res: Response) => {
-  const config = getAppConfig();
+  const config = await getAppConfig();
   const token = req.cookies[config.auth.sessionTokenKey];
 
   if (token) {
