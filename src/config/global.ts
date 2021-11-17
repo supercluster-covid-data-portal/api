@@ -35,7 +35,7 @@ interface AppConfig {
 
 const getAppConfig: () => AppConfig = () => ({
   auth: {
-    apiRootUrl: process.env.AUTH_API_ROOT || 'http://localhost:8080',
+    apiRootUrl: process.env.AUTH_API_ROOT || 'http://localhost:4000',
     jwksUri: process.env.AUTH_API_ROOT ? urlJoin(process.env.AUTH_API_ROOT, JWKS_ENDPOINT) : '',
     clientId: process.env.AUTH_CLIENT_ID || '',
     clientSecret: process.env.AUTH_CLIENT_SECRET || '',
