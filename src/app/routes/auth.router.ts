@@ -19,10 +19,13 @@
 
 import { CookieOptions, NextFunction, Request, Response, Router } from 'express';
 import jwtDecode from 'jwt-decode';
-import { AUTH_ENDPOINT } from '../../constants/endpoint';
+
 import getAppConfig from '../../config/global';
+import { AUTH_ENDPOINT } from '../../constants/endpoint';
+import logger from '../../logger';
 import { extractUser, fetchAuthToken, fetchUserInfo } from '../services/auth.service';
 
+export const path: string = AUTH_ENDPOINT;
 export const router: Router = Router();
 
 router.use(async (req: Request, res: Response, next: NextFunction) => {
@@ -31,46 +34,58 @@ router.use(async (req: Request, res: Response, next: NextFunction) => {
   res.header('Access-Control-Allow-Origin', config.ui.rootUrl);
   res.header('Access-Control-Allow-Header', 'Content-Type');
   res.header('Access-Control-Allow-Credentials', 'true');
-  next();
+
+  return next();
 });
 
 // TODO reconfigure so AuthRouter has AUTH_ENDPOINT as base
-router.post(`${AUTH_ENDPOINT}/token`, async (req: Request, res: Response) => {
-  const code = req.query.code as string;
+router.post('/token', async (req: Request, res: Response) => {
+  try {
+    const code = req.query.code as string;
 
-  if (!code) {
-    res.status(400).send('Missing parameters');
-  }
+    if (code) {
+      const tokens = await fetchAuthToken(code);
+      const config = await getAppConfig();
+      const domain = new URL(config.ui.rootUrl as string);
 
-  const tokens = await fetchAuthToken(code);
-  if (tokens.accessToken && tokens.idToken) {
-    const config = await getAppConfig();
-    const domain = new URL(config.ui.rootUrl as string);
-    const cookieConfig: CookieOptions = {
-      sameSite: 'strict',
-      secure: true,
-      maxAge: config.auth.sessionDuration,
-      domain: domain.hostname,
-      path: '/',
-    };
-    // attach jwt as cookie - this will become a session id
-    res.cookie(config.auth.sessionTokenKey, tokens.accessToken, cookieConfig);
-    // return userInfo in the response
-    const userInfo = extractUser(jwtDecode(tokens.idToken));
-    res.status(200).send(userInfo);
-  } else {
-    res.status(500).send('Login failed');
+      const cookieConfig: CookieOptions = {
+        sameSite: 'strict',
+        secure: true,
+        maxAge: config.auth.sessionDuration,
+        domain: domain.hostname,
+        path: '/',
+      };
+
+      // attach jwt as cookie - this will become a session id
+      res.cookie(config.auth.sessionTokenKey, tokens.accessToken, cookieConfig);
+
+      // return userInfo in the response
+      const userInfo = extractUser(jwtDecode(tokens.idToken));
+
+      return res.status(200).send(userInfo);
+    }
+
+    return res.status(400).send('Missing parameters');
+  } catch (error) {
+    logger.error(error);
+    return res.status(500).send('Login failed');
   }
 });
 
-router.get(`${AUTH_ENDPOINT}/user-info`, async (req: Request, res: Response) => {
-  const config = await getAppConfig();
-  const token = req.cookies[config.auth.sessionTokenKey];
+router.get('/user-info', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const config = await getAppConfig();
+    const token = req.cookies[config.auth.sessionTokenKey];
 
-  if (token) {
-    const user = await fetchUserInfo(token);
-    res.status(200).send(user);
-  } else {
-    res.status(401).send('Please login');
+    if (token) {
+      const user = await fetchUserInfo(token);
+
+      return res.status(200).send(user);
+    }
+
+    return res.status(401).send('Please login');
+  } catch (error) {
+    logger.error(error);
+    return next(error);
   }
 });

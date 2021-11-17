@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 
+import { HEALTH_ENDPOINT } from './constants/endpoint';
 import { getFilesWithKeyword } from './utils/getFilesWithKeyword';
 
 const app: Express = express();
@@ -19,9 +20,16 @@ app.use(cookieParser());
 app.use(cors());
 
 // Handle logs in console during development
-if (process.env.NODE_ENV === 'development') {
-  app.use(morgan('dev'));
-}
+app.use(
+  morgan('dev', {
+    skip: (req, res) => {
+      // logs everything but health checks on dev, errors only otherwise
+      return process.env.NODE_ENV === 'development' || process.env.DEBUG === 'true'
+        ? req.originalUrl === HEALTH_ENDPOINT
+        : res.statusCode < 400;
+    },
+  }),
+);
 
 // Handle security and origin in production
 if (process.env.NODE_ENV === 'production') {
@@ -33,20 +41,36 @@ if (process.env.NODE_ENV === 'production') {
  ***********************************************************************************/
 
 getFilesWithKeyword('router', __dirname + '/app').forEach((file: string) => {
-  const { router } = require(file);
-  app.use(router);
+  const { path = '/', router } = require(file);
+
+  router
+    ? app.use(path, router)
+    : console.warn(`${file} doesn't seen to export a 'router', expected at ${path}`);
 });
 
 /************************************************************************************
  *                               Express Error Handling
  ***********************************************************************************/
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+app.use((error: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  if (error.response) {
+    if (error.response.status === 409) {
+      return res.status(400).send({
+        message: 'Conflict updating the information',
+      });
+    }
+  } else if (error.request) {
+    // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+    // http.ClientRequest in node.js
+    console.log(error.request);
+  } else {
+    console.log('Error', error.message);
+  }
+
   return res.status(500).json({
-    errorName: err.name,
-    message: err.message,
-    stack: err.stack || 'no stack defined',
+    errorName: error.name,
+    message: error.message,
+    ...(error.stack && { stack: error.stack }),
   });
 });
 

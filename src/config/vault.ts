@@ -1,5 +1,6 @@
 import vault from 'node-vault';
 import { promises } from 'fs';
+
 import logger from '../logger';
 
 let vaultClient: vault.client;
@@ -16,9 +17,11 @@ async function login() {
       endpoint: process.env.VAULT_URL || 'http://localhost:8200', // default
       token: givenToken,
     };
+
     vaultClient = vault(options);
     return;
   }
+
   logger.info('Logging into Vault with Kubernetes Auth');
 
   // otherwise try and load the token from kubernetes
@@ -30,12 +33,12 @@ async function login() {
   // exchange for a vault token
   const options: vault.VaultOptions = {
     apiVersion: 'v1', // default
-    endpoint: process.env.VAULT_URL, // default
+    endpoint: process.env.VAULT_URL || 'http://localhost:8200', // default
   };
 
   vaultClient = vault(options);
   const response = await vaultClient.kubernetesLogin({
-    role: process.env.VAULT_ROLE,
+    role: process.env.VAULT_ROLE || 'api',
     jwt: k8sToken,
   });
 

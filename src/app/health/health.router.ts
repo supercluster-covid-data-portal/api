@@ -6,6 +6,10 @@ export const router: Router = Router();
 
 // getStatus
 router.get('/', (req, res) => {
+  res.status(200);
+});
+
+router.get(HEALTH_ENDPOINT, (req, res) => {
   res.status(200).send({
     status: 'API Server is running...',
   });

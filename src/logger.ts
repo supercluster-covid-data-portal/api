@@ -19,6 +19,7 @@
 
 import { createLogger, LoggerOptions, transports, format } from 'winston';
 
+const DEBUG_MODE = process.env.NODE_ENV === 'development' || process.env.DEBUG === 'true';
 const { combine, timestamp, colorize, printf } = format;
 const options: LoggerOptions = {
   format: combine(
@@ -28,7 +29,7 @@ const options: LoggerOptions = {
   ),
   transports: [
     new transports.Console({
-      level: process.env.NODE_ENV === 'production' ? 'error' : 'debug',
+      level: DEBUG_MODE ? 'debug' : 'error',
     }),
     new transports.File({ filename: 'debug.log', level: 'debug' }),
   ],
@@ -36,7 +37,7 @@ const options: LoggerOptions = {
 
 const logger = createLogger(options);
 
-if (process.env.NODE_ENV !== 'production') {
+if (DEBUG_MODE) {
   logger.debug('Logging initialized at debug level');
 }
 
