@@ -58,7 +58,6 @@ COPY --from=builder \
     /usr/node_modules/ \
     $APP_HOME/node_modules/
 
-# VOLUME [ "/usr/src/public/static/dms_user_assets" ]
 EXPOSE $PORT
 
 CMD npm start

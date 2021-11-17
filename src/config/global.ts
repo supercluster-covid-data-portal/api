@@ -63,7 +63,7 @@ const buildAppConfig = async (secrets: any): Promise<AppConfig> => {
   logger.info('Building app config...');
   config = {
     auth: {
-      apiRootUrl: process.env.AUTH_API_ROOT || 'http://localhost:8080',
+      apiRootUrl: process.env.AUTH_API_ROOT || 'http://localhost:4000',
       jwksUri: process.env.AUTH_API_ROOT ? urlJoin(process.env.AUTH_API_ROOT, JWKS_ENDPOINT) : '',
       clientId: process.env.AUTH_CLIENT_ID || '',
       clientSecret: secrets.AUTH_CLIENT_SECRET || process.env.AUTH_CLIENT_SECRET || '',
