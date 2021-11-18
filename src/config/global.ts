@@ -32,31 +32,27 @@ interface AppConfig {
     sessionDuration: number;
     sessionTokenKey: string;
   };
-  ui: {
-    rootUrl: string;
+  client: {
+    domain: string;
   };
 }
 let config: AppConfig | undefined = undefined;
 
-const loadVaultSecrets = async () => {
-  const vaultEnabled = (process.env.VAULT_ENABLED || '').toLowerCase() === 'true';
+const vaultEnabled = (process.env.VAULT_ENABLED || '').toLowerCase() === 'true';
 
-  /** Vault */
-  if (vaultEnabled) {
+const loadVaultSecrets = async () => {
+  logger.info('Loading Vault secrets...');
+
+  try {
     if (process.env.VAULT_SECRETS_PATH) {
-      try {
-        return await vault.loadSecret(process.env.VAULT_SECRETS_PATH);
-      } catch (err) {
-        logger.error('Failed to load secrets from vault.');
-        throw new Error('Failed to load secrets from vault.');
-      }
+      return await vault.loadSecret(process.env.VAULT_SECRETS_PATH);
     }
 
-    logger.error('Path to secrets not specified but vault is enabled');
     throw new Error('Path to secrets not specified but vault is enabled');
+  } catch (error) {
+    logger.error(error);
+    throw new Error('Failed to load secrets from vault.');
   }
-
-  return {};
 };
 
 const buildAppConfig = async (secrets: Record<string, any> = {}): Promise<AppConfig> => {
@@ -64,15 +60,15 @@ const buildAppConfig = async (secrets: Record<string, any> = {}): Promise<AppCon
 
   config = {
     auth: {
-      apiRootUrl: process.env.AUTH_API_ROOT || 'http://localhost:4000',
+      apiRootUrl: process.env.AUTH_API_ROOT || '',
       jwksUri: process.env.AUTH_API_ROOT ? urlJoin(process.env.AUTH_API_ROOT, JWKS_ENDPOINT) : '',
       clientId: process.env.AUTH_CLIENT_ID || '',
       clientSecret: secrets.AUTH_CLIENT_SECRET || process.env.AUTH_CLIENT_SECRET || '',
       sessionDuration: Number(process.env.AUTH_SESSION_DURATION) || 1800000,
       sessionTokenKey: process.env.AUTH_SESSION_TOKEN_KEY || '',
     },
-    ui: {
-      rootUrl: process.env.UI_ROOT_URL || 'http://localhost:3000',
+    client: {
+      domain: process.env.DOMAIN_ROOT_URL || 'http://localhost:3000',
     },
   };
 
@@ -84,12 +80,10 @@ const getAppConfig = async (envFile?: string): Promise<AppConfig> => {
     return config;
   }
 
-  try {
+  if (vaultEnabled) {
     const secrets = await loadVaultSecrets();
 
     return buildAppConfig(secrets);
-  } catch (error) {
-    // catch and release to avoid app crashes
   }
 
   return buildAppConfig();

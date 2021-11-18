@@ -55,6 +55,7 @@ export const validateJwt: (jwt: string) => Promise<boolean> = async (jwt) => {
     kid = kidFromJwt;
     pubkey = newPubKey;
   }
+
   return verifyJwt(pubkey, jwt, alg);
 };
 
@@ -83,17 +84,19 @@ export const extractUser: (jwtData: WalletJwtData) => WalletUser = (jwtData) => 
   };
 };
 
-export const fetchAuthToken: (
+export const fetchAuthToken = async (
   authCode: string,
-) => Promise<{ idToken: string; accessToken: string }> = async (authCode) => {
+): Promise<{ idToken: string; accessToken: string }> => {
   const config = await getAppConfig();
-  const loginUrl = new URL(urlJoin(config.auth.apiRootUrl as string, 'oauth/token'));
+  const credentials = `${config.auth.clientId}:${config.auth.clientSecret}`;
+  const loginUrl = new URL(urlJoin(config.auth.apiRootUrl, 'oauth/token'));
   loginUrl.searchParams.append('grant_type', 'authorization_code');
   loginUrl.searchParams.append('code', authCode);
 
-  const encoded = Buffer.from(`${config.auth.clientId}:${config.auth.clientSecret}`).toString(
-    'base64',
-  );
+  const encoded = Buffer.from(credentials).toString('base64');
+
+  logger.info('Calling oauth API to get tokens');
+
   const tokenResponse: TokenResponseData = await axios
     .post(
       loginUrl.href,
@@ -110,8 +113,9 @@ export const fetchAuthToken: (
       }
       throw new Error(`Auth token response is not OK: ${res.status}`);
     })
-    .catch((err: AxiosError) => {
-      logger.warn('Token fetch failed, unable to login.', err);
+    .catch((error: AxiosError) => {
+      logger.warn('Token fetch failed, unable to login.');
+      throw error;
     });
 
   const idToken = tokenResponse.id_token;
@@ -122,6 +126,7 @@ export const fetchAuthToken: (
   if (!(validIdToken && validAccessToken)) {
     throw new Error('Invalid JWT!!');
   }
+
   return { idToken, accessToken };
 };
 
@@ -129,7 +134,7 @@ export const fetchAuthToken: (
 export const fetchUserInfo = async (token: string) => {
   const config = await getAppConfig();
   const userResult = await axios
-    .get(urlJoin(config.auth.apiRootUrl as string, 'api/v1/users/me'), {
+    .get(urlJoin(config.auth.apiRootUrl, 'api/v1/users/me'), {
       headers: {
         Authorization: `Bearer ${token}`,
       },

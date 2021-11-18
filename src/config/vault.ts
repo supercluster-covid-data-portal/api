@@ -10,6 +10,7 @@ async function login() {
 
   // if the app provided a token in the env use that
   const givenToken = process.env.VAULT_TOKEN;
+
   if (givenToken) {
     logger.info('Logging into Vault with Token Auth');
     const options: vault.VaultOptions = {
@@ -42,7 +43,7 @@ async function login() {
     jwt: k8sToken,
   });
 
-  const clientToken = response.auth.client_token as string;
+  const clientToken = response.auth.client_token;
   console.log(`Login successful, token length: ${clientToken.length}`);
 }
 

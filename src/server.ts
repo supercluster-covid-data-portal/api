@@ -1,10 +1,11 @@
-import express, { Express, Router } from 'express';
-import morgan from 'morgan';
-import helmet from 'helmet';
-import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
+import express, { Express } from 'express';
+import helmet from 'helmet';
+import morgan from 'morgan';
 
 import { ARRANGER_READY_ENDPOINT, HEALTH_ENDPOINT } from './constants/endpoint';
+import logger from './logger';
 import { getFilesWithKeyword } from './utils/getFilesWithKeyword';
 
 const app: Express = express();
@@ -17,7 +18,12 @@ app.set('json spaces', 4);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(cors());
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+  }),
+);
 
 // Handle logs in console during development
 app.use(
@@ -40,7 +46,7 @@ if (process.env.NODE_ENV === 'production') {
  *                               Register all routes
  ***********************************************************************************/
 
-getFilesWithKeyword('router', __dirname + '/app').forEach((file: string) => {
+getFilesWithKeyword('router', __dirname + '/routes').forEach((file: string) => {
   const { path = '/', router } = require(file);
 
   router
@@ -62,9 +68,9 @@ app.use((error: any, req: express.Request, res: express.Response, next: express.
   } else if (error.request) {
     // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
     // http.ClientRequest in node.js
-    console.log(error.request);
+    logger.error(error.request);
   } else {
-    console.log('Error', error.message);
+    logger.error(error.message);
   }
 
   return res.status(500).json({

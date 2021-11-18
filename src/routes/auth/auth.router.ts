@@ -23,22 +23,11 @@ import jwtDecode from 'jwt-decode';
 import getAppConfig from '../../config/global';
 import { AUTH_ENDPOINT } from '../../constants/endpoint';
 import logger from '../../logger';
-import { extractUser, fetchAuthToken, fetchUserInfo } from '../services/auth.service';
+import { extractUser, fetchAuthToken, fetchUserInfo } from './auth.service';
 
 export const path: string = AUTH_ENDPOINT;
 export const router: Router = Router();
 
-router.use(async (req: Request, res: Response, next: NextFunction) => {
-  const config = await getAppConfig();
-
-  res.header('Access-Control-Allow-Origin', config.ui.rootUrl);
-  res.header('Access-Control-Allow-Header', 'Content-Type');
-  res.header('Access-Control-Allow-Credentials', 'true');
-
-  return next();
-});
-
-// TODO reconfigure so AuthRouter has AUTH_ENDPOINT as base
 router.post('/token', async (req: Request, res: Response) => {
   try {
     const code = req.query.code as string;
@@ -46,14 +35,14 @@ router.post('/token', async (req: Request, res: Response) => {
     if (code) {
       const tokens = await fetchAuthToken(code);
       const config = await getAppConfig();
-      const domain = new URL(config.ui.rootUrl as string);
+      const domain = new URL(config.client.domain);
 
       const cookieConfig: CookieOptions = {
+        domain: domain.hostname,
+        maxAge: config.auth.sessionDuration,
+        path: '/',
         sameSite: 'strict',
         secure: true,
-        maxAge: config.auth.sessionDuration,
-        domain: domain.hostname,
-        path: '/',
       };
 
       // attach jwt as cookie - this will become a session id
