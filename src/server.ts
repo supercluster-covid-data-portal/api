@@ -4,7 +4,7 @@ import helmet from 'helmet';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 
-import { HEALTH_ENDPOINT } from './constants/endpoint';
+import { ARRANGER_READY_ENDPOINT, HEALTH_ENDPOINT } from './constants/endpoint';
 import { getFilesWithKeyword } from './utils/getFilesWithKeyword';
 
 const app: Express = express();
@@ -25,7 +25,7 @@ app.use(
     skip: (req, res) => {
       // logs everything but health checks on dev, errors only otherwise
       return process.env.NODE_ENV === 'development' || process.env.DEBUG === 'true'
-        ? req.originalUrl === HEALTH_ENDPOINT
+        ? [ARRANGER_READY_ENDPOINT, HEALTH_ENDPOINT].includes(req.originalUrl)
         : res.statusCode < 400;
     },
   }),
