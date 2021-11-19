@@ -49,17 +49,6 @@
       "query": null,
       "jsonPath": null,
       "id": null,
-      "field": "files.file_type",
-      "accessor": "files.file_type"
-    },
-    {
-      "show": true,
-      "type": "string",
-      "sortable": true,
-      "canChangeShow": true,
-      "query": null,
-      "jsonPath": null,
-      "id": null,
       "field": "sample.authors",
       "accessor": "sample.authors"
     }
