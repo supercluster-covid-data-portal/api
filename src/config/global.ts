@@ -35,6 +35,9 @@ interface AppConfig {
   client: {
     domain: string;
   };
+  flag: {
+    storageRootAdmin: boolean;
+  };
 }
 let config: AppConfig | undefined = undefined;
 
@@ -69,6 +72,10 @@ const buildAppConfig = async (secrets: Record<string, any> = {}): Promise<AppCon
     },
     client: {
       domain: process.env.DOMAIN_ROOT_URL || 'http://localhost:3000',
+    },
+    flag: {
+      storageRootAdmin:
+        (process.env.FLAG__STORAGE_ROOT_ADMIN || '').toLowerCase() === 'true' || false,
     },
   };
 

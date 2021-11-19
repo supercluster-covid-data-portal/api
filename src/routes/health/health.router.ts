@@ -6,7 +6,7 @@ export const router: Router = Router();
 
 // getStatus
 router.get('/', (req, res) => {
-  res.status(200);
+  res.status(200).send();
 });
 
 router.get(HEALTH_ENDPOINT, (req, res) => {

@@ -1,65 +1,89 @@
 import { Method } from 'axios';
 
-import { StorageResponse } from '../types/storage';
+import { StorageResponse } from '../types';
 import { fetchStorage } from '../utils';
 
 import { SingleQueryResponse, StoredQueriesResponse, StoredQueryObject } from './types';
 
-export const needsQueryId = (method: Method) => ['DELETE', 'PUT'].includes(method);
+const transformQueriesResponse = (
+  storageResponse: StorageResponse,
+): StoredQueriesResponse | void => {
+  if (storageResponse?.data?.hasOwnProperty('queries')) {
+    return {
+      etag: storageResponse.etag,
+      queries: storageResponse.data.queries,
+    };
+  }
+};
 
-export const initialiseQueryStorage = async (etag: string): Promise<StorageResponse | void> => {
-  if (etag) {
+export const initialiseQueryStorage = async ({
+  etag,
+  tokenBearer,
+  userId,
+}: {
+  etag?: string;
+  tokenBearer?: string;
+  userId?: string;
+}): Promise<StoredQueriesResponse | void> => {
+  console.error('initialising this stuff???');
+  if (etag && tokenBearer && userId) {
     return fetchStorage({
-      data: JSON.stringify([
+      data: [
         {
           op: 'add',
           path: '/queries',
           value: {},
         },
-      ]),
+      ],
       etag,
       method: 'PATCH',
-    });
+      tokenBearer,
+      userId,
+    }).then(transformQueriesResponse);
   }
 
   throw {
-    message: 'no etag was present while attempting to initialise query storage',
+    message:
+      'One of the required parametres was not present while attempting to initialise query storage',
     status: 400,
   };
 };
 
-export const fetchQueries =
-  (etag: string = '') =>
+// WIP temporary omnipotent fetching helper
+// TODO: break it down into smaller + specialised helpers
+export const fetchQueries = (etag = '', tokenBearer = '', userId = '') => {
   //TODO: check these options
-  (options?: any) =>
+  return (options?: Record<string, any>) =>
     fetchStorage({
       etag,
+      tokenBearer,
+      userId,
       ...options,
-    })
-      .then(async (storageResponse: StorageResponse): Promise<StoredQueriesResponse> => {
-        try {
-          if (storageResponse?.data?.hasOwnProperty('queries')) {
-            return {
-              etag: storageResponse.etag,
-              queries: storageResponse.data.queries,
-            };
-          }
+    }).then(async (storageResponse: StorageResponse): Promise<StoredQueriesResponse | void> => {
+      try {
+        return (
+          transformQueriesResponse(storageResponse) ||
+          (await initialiseQueryStorage({
+            etag: storageResponse.etag,
+            tokenBearer,
+            userId,
+          }))
+        );
+      } catch (error) {
+        console.error(error);
+        throw {
+          message: 'Could not fetch stored queries correctly',
+          status: 500,
+        };
+      }
+    });
+};
 
-          return await initialiseQueryStorage(storageResponse.etag);
-        } catch (error) {
-          console.error(error);
-          throw {
-            message: 'Could not fetch stored queries correctly',
-            status: 500,
-          };
-        }
-      })
-      .catch((error) => {
-        throw error;
-      });
+export const methodRequiresQueryId = (method: Method) => ['DELETE', 'PUT'].includes(method);
 
-export const getQueryById = (queryId: string) =>
-  fetchQueries()().then((data: StoredQueriesResponse): SingleQueryResponse => {
+export const getStoredQueryById =
+  (queryId: string) =>
+  (data: StoredQueriesResponse | void): SingleQueryResponse => {
     const found = data?.queries?.[queryId];
     if (found) {
       return { etag: data.etag, ...found };
@@ -69,7 +93,7 @@ export const getQueryById = (queryId: string) =>
       message: 'We could not find a stored query using that ID',
       status: 404,
     };
-  });
+  };
 
 export const compareDifferentQueries = (
   previousQuery: StoredQueryObject,
@@ -78,7 +102,7 @@ export const compareDifferentQueries = (
   return !(previousQuery.label === nextQuery.label && previousQuery.url === nextQuery.url);
 };
 
-export const validateNextQuery = (query: StoredQueryObject): Error | void => {
+export const validateNextQuery = (query: StoredQueryObject): void => {
   if (query) {
     if (['label', 'url'].toString() === Object.keys(query).toString()) {
       if (query.label && typeof query.label === 'string') {
