@@ -40,6 +40,7 @@ app.use(
 // Handle security and origin in production
 if (process.env.NODE_ENV === 'production') {
   app.use(helmet());
+  app.disable('x-powered-by');
 }
 
 /************************************************************************************
