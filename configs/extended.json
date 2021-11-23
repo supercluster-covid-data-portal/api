@@ -356,7 +356,7 @@
     "primaryKey": false,
     "quickSearchEnabled": false,
     "rangeStep": 1,
-    "type": "keyword",
+    "type": "text",
     "unit": null
   },
   {
@@ -656,7 +656,7 @@
     "primaryKey": false,
     "quickSearchEnabled": false,
     "rangeStep": 1,
-    "type": "keyword",
+    "type": "text",
     "unit": null
   },
   {
@@ -680,7 +680,7 @@
     "primaryKey": false,
     "quickSearchEnabled": false,
     "rangeStep": 1,
-    "type": "keyword",
+    "type": "text",
     "unit": null
   },
   {
