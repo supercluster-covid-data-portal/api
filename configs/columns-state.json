@@ -170,8 +170,8 @@
       "query": null,
       "jsonPath": null,
       "id": null,
-      "field": "host.host_location_of_exposure_geo_loc_name_country",
-      "accessor": "host.host_location_of_exposure_geo_loc_name_country"
+      "field": "host.location_of_exposure_geo_loc_name_country",
+      "accessor": "host.location_of_exposure_geo_loc_name_country"
     },
     {
       "show": true,
@@ -181,8 +181,8 @@
       "query": null,
       "jsonPath": null,
       "id": null,
-      "field": "host.host_location_of_exposure_geo_loc_name_state_province_territory",
-      "accessor": "host.host_location_of_exposure_geo_loc_name_state_province_territory"
+      "field": "host.location_of_exposure_geo_loc_name_state_province_territory",
+      "accessor": "host.location_of_exposure_geo_loc_name_state_province_territory"
     },
     {
       "show": true,

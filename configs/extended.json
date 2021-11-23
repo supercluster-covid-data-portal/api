@@ -277,7 +277,7 @@
   },
   {
     "active": false,
-    "displayName": "Files Drs Filepath",
+    "displayName": "DRS Filepath",
     "displayValues": {},
     "field": "files.drs_filepath",
     "isArray": false,
@@ -356,7 +356,7 @@
     "primaryKey": false,
     "quickSearchEnabled": false,
     "rangeStep": 1,
-    "type": "id",
+    "type": "keyword",
     "unit": null
   },
   {
@@ -1501,7 +1501,7 @@
   },
   {
     "active": false,
-    "displayName": "Sample Geo Loc Name Country",
+    "displayName": "Sample Country of Collection",
     "displayValues": {},
     "field": "sample.geo_loc_name_country",
     "isArray": false,
@@ -1525,7 +1525,7 @@
   },
   {
     "active": false,
-    "displayName": "Sample Geo Loc Name State Province Territory",
+    "displayName": "Sample State/Province/Territory of Collection",
     "displayValues": {},
     "field": "sample.geo_loc_name_state_province_territory",
     "isArray": false,
@@ -1657,7 +1657,7 @@
   },
   {
     "active": false,
-    "displayName": "Sample Sample Collected By",
+    "displayName": "Sample Collected By",
     "displayValues": {},
     "field": "sample.sample_collected_by",
     "isArray": false,
