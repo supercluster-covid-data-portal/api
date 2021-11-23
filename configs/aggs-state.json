@@ -20,6 +20,11 @@
     "show": true
   },
   {
+    "field": "host__host_age_bin",
+    "active": true,
+    "show": true
+  },
+  {
     "field": "host__host_gender",
     "active": true,
     "show": true
