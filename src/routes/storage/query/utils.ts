@@ -25,7 +25,6 @@ export const initialiseQueryStorage = async ({
   tokenBearer?: string;
   userId?: string;
 }): Promise<StoredQueriesResponse | void> => {
-  console.error('initialising this stuff???');
   if (etag && tokenBearer && userId) {
     return fetchStorage({
       data: [
