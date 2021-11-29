@@ -43,7 +43,7 @@ export const initialiseQueryStorage = async ({
 
   throw {
     message:
-      'One of the required parametres was not present while attempting to initialise query storage',
+      'One of the required parameters was not present while attempting to initialise query storage',
     status: 400,
   };
 };
