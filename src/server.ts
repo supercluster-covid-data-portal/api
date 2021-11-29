@@ -40,6 +40,7 @@ app.use(
 // Handle security and origin in production
 if (process.env.NODE_ENV === 'production') {
   app.use(helmet());
+  app.disable('x-powered-by');
 }
 
 /************************************************************************************
@@ -73,7 +74,7 @@ app.use((error: any, req: express.Request, res: express.Response, next: express.
     logger.error(error.message);
   }
 
-  return res.status(500).json({
+  return res.status(error.status || 500).json({
     errorName: error.name,
     message: error.message,
     ...(error.stack && { stack: error.stack }),
