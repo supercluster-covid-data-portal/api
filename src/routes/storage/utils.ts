@@ -45,7 +45,7 @@ export const fetchStorage = async ({
 
       return response?.data
         ? {
-            data: response?.data,
+            data: response.data,
             etag: responseETag,
           }
         : response.status === 204
