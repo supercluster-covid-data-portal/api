@@ -59,17 +59,18 @@ export const fetchStorage = async ({
           response as unknown as StorageResponse);
     })
     .catch(async (error: AxiosError) => {
-      // WIP temporary catch and release
-      // TODO: initialise new users
+      const initialised =
+        error.response?.status === 404 &&
+        method.toUpperCase() === 'GET' &&
+        (await fetchStorage({
+          data: INITIAL_STORAGE,
+          etag,
+          method: 'PUT',
+          tokenBearer,
+          userId,
+        }));
 
-      // const initialised =
-      //   jsonError.status === 404 &&
-      //   method.toUpperCase() === 'GET' &&
-      //   (await fetchStorage({
-      //     data: INITIAL_STORAGE,
-      //     method: 'PUT',
-      //   }));
-      // if (initialised) return initialised;
+      if (initialised) return initialised;
 
       throw error.toJSON();
     });
