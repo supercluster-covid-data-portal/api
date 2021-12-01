@@ -19,6 +19,7 @@
 
 import { CookieOptions, NextFunction, Request, Response, Router } from 'express';
 import jwtDecode from 'jwt-decode';
+import { URL } from 'url';
 
 import getAppConfig from '../../config/global';
 import { AUTH_ENDPOINT } from '../../constants/endpoint';

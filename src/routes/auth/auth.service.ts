@@ -27,6 +27,7 @@ import { TokenResponseData, WalletJwtData, WalletJwtHeaderData, WalletUser } fro
 import getAppConfig from '../../config/global';
 import logger from '../../logger';
 import { get } from 'lodash';
+import { URL } from 'url';
 
 let kid: string;
 let pubkey: string;

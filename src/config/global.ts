@@ -23,7 +23,7 @@ import { JWKS_ENDPOINT } from '../constants/endpoint';
 import logger from '../logger';
 import * as vault from './vault';
 
-interface AppConfig {
+export interface AppConfig {
   auth: {
     apiRootUrl: string;
     jwksUri: string;
@@ -35,7 +35,12 @@ interface AppConfig {
   client: {
     domain: string;
   };
+  drs: {
+    objectPath: string;
+    protocol: string;
+  };
 }
+
 let config: AppConfig | undefined = undefined;
 
 const vaultEnabled = (process.env.VAULT_ENABLED || '').toLowerCase() === 'true';
@@ -69,6 +74,10 @@ const buildAppConfig = async (secrets: Record<string, any> = {}): Promise<AppCon
     },
     client: {
       domain: process.env.DOMAIN_ROOT_URL || 'http://localhost:3000',
+    },
+    drs: {
+      objectPath: process.env.DRS_OBJECT_PATH || 'ga4gh/drs/v1/objects',
+      protocol: process.env.DRS_PROTOCOL || 'https',
     },
   };
 
