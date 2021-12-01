@@ -30,10 +30,6 @@ export const fetchStorage = async ({
   const config = await getAppConfig();
   const url = `${config.auth.apiRootUrl}/clients/${config.auth.clientId}/users/${userId}/properties/`;
 
-  console.log('url', url);
-  console.log('method', method);
-  console.log('data', data);
-
   return axios({
     ...(needsData(method) && { data }),
     headers,
