@@ -34,7 +34,7 @@
     "typescript-transform-paths": "^3.3.1"
   },
   "dependencies": {
-    "@caravinci/arranger-server": "^2.15.2",
+    "@caravinci/arranger-server": "^2.15.4",
     "axios": "^0.24.0",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
