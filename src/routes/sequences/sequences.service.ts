@@ -46,7 +46,7 @@ const fetchDRSMetadata = async (drsUri: string) => {
   const response = await fetch(drsUri)
     .then((res) => {
       if (res.status !== 200) {
-        throw new Error(`Response from drs url failed with: ${res.status}`);
+        throw new Error(`Response from drs url failed with ${res.status} error.`);
       }
       return res.json();
     })
@@ -66,9 +66,7 @@ const fetchDRSMetadata = async (drsUri: string) => {
 const downloadFromAccessUrl = async (url: string) => {
   const response = await fetch(url);
   if (response.status !== 200) {
-    console.log(url);
-
-    throw new Error(`Download from access url failed with ${response.status}`);
+    throw new Error(`Download from access url failed with ${response.status} error.`);
   }
   return response.body;
 };
@@ -114,17 +112,11 @@ const retrieveFiles = async (drsInfo: { sequenceId: string; drsPath: string }[])
     },
   );
   const files = await Promise.all(downloaded);
-  // if no files are found *at all* we will send an error to the ui
-  if (!files.length) {
-    throw new Error('No files found for the requested sequence ids.');
-  }
   return files;
 };
 
 export const downloadSequenceFiles = async (ids: string[]) => {
   // TODO: add query for drs data, returns drs_filepath and file_id
-  // if there are no files for an id, just skip?
-  // also, if the no files for selected ids, just return an empty response that ui can handle
   const config = await getAppConfig();
   const queryResult = testData.slice(0, 2);
 
@@ -144,6 +136,11 @@ export const downloadSequenceFiles = async (ids: string[]) => {
       };
     }),
   );
+
+  // if no files are found for any of the sequence ids we will send an error to the ui
+  if (fileResults.every((res) => res.files.length === 0)) {
+    throw new Error('No files found for the requested sequence ids.');
+  }
   logger.info(`Successfully retrieved files.`);
   return fileResults;
 };
