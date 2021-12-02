@@ -39,6 +39,9 @@ export interface AppConfig {
     objectPath: string;
     protocol: string;
   };
+  flag: {
+    storageRootAdmin: boolean;
+  };
 }
 
 let config: AppConfig | undefined = undefined;
@@ -78,6 +81,10 @@ const buildAppConfig = async (secrets: Record<string, any> = {}): Promise<AppCon
     drs: {
       objectPath: process.env.DRS_OBJECT_PATH || 'ga4gh/drs/v1/objects',
       protocol: process.env.DRS_PROTOCOL || 'https',
+    },
+    flag: {
+      storageRootAdmin:
+        (process.env.FLAG__STORAGE_ROOT_ADMIN || '').toLowerCase() === 'true' || false,
     },
   };
 

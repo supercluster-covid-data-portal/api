@@ -47,6 +47,10 @@ COPY --from=builder \
   $APP_HOME
 
 COPY --from=builder \
+  /usr/tsconfig.json \
+  $APP_HOME
+
+COPY --from=builder \
   /usr/configs \
   $APP_HOME/configs
 

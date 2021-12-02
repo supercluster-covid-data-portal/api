@@ -3,7 +3,7 @@
   "keyField": "id",
   "defaultSorted": [
     {
-      "id": "sequence_id.keyword",
+      "id": "sequence_id",
       "desc": false
     }
   ],
@@ -27,8 +27,129 @@
       "query": null,
       "jsonPath": null,
       "id": null,
-      "field": "sample.sample_id",
-      "accessor": "sample.sample_id"
+      "field": "data_source.data_source_name",
+      "accessor": "data_source.data_source_name"
+    },
+    {
+      "show": true,
+      "type": "string",
+      "sortable": true,
+      "canChangeShow": true,
+      "query": null,
+      "jsonPath": null,
+      "id": null,
+      "field": "host.host_common_name",
+      "accessor": "host.host_common_name"
+    },
+    {
+      "show": true,
+      "type": "string",
+      "sortable": true,
+      "canChangeShow": true,
+      "query": null,
+      "jsonPath": null,
+      "id": null,
+      "field": "host.host_age",
+      "accessor": "host.host_age"
+    },
+    {
+      "show": true,
+      "type": "string",
+      "sortable": true,
+      "canChangeShow": true,
+      "query": null,
+      "jsonPath": null,
+      "id": null,
+      "field": "host.host_age_bin",
+      "accessor": "host.host_age_bin"
+    },
+    {
+      "show": true,
+      "type": "string",
+      "sortable": true,
+      "canChangeShow": true,
+      "query": null,
+      "jsonPath": null,
+      "id": null,
+      "field": "host.host_gender",
+      "accessor": "host.host_gender"
+    },
+    {
+      "show": true,
+      "type": "string",
+      "sortable": true,
+      "canChangeShow": true,
+      "query": null,
+      "jsonPath": null,
+      "id": null,
+      "field": "host.host_ethnicity",
+      "accessor": "host.host_ethnicity"
+    },
+    {
+      "show": true,
+      "type": "string",
+      "sortable": true,
+      "canChangeShow": true,
+      "query": null,
+      "jsonPath": null,
+      "id": null,
+      "field": "host.host_health_state",
+      "accessor": "host.host_health_state"
+    },
+    {
+      "show": true,
+      "type": "string",
+      "sortable": true,
+      "canChangeShow": true,
+      "query": null,
+      "jsonPath": null,
+      "id": null,
+      "field": "host.host_residence_geo_loc_name_country",
+      "accessor": "host.host_residence_geo_loc_name_country"
+    },
+    {
+      "show": true,
+      "type": "string",
+      "sortable": true,
+      "canChangeShow": true,
+      "query": null,
+      "jsonPath": null,
+      "id": null,
+      "field": "host.host_residence_geo_loc_name_state_province_territory",
+      "accessor": "host.host_residence_geo_loc_name_state_province_territory"
+    },
+    {
+      "show": true,
+      "type": "string",
+      "sortable": true,
+      "canChangeShow": true,
+      "query": null,
+      "jsonPath": null,
+      "id": null,
+      "field": "host.host_disease",
+      "accessor": "host.host_disease"
+    },
+    {
+      "show": true,
+      "type": "string",
+      "sortable": true,
+      "canChangeShow": true,
+      "query": null,
+      "jsonPath": null,
+      "id": null,
+      "field": "gisaid_virus_name",
+      "accessor": "gisaid_virus_name"
+    },
+    {
+      "show": true,
+      "type": "string",
+      "sortable": true,
+      "canChangeShow": true,
+      "query": null,
+      "jsonPath": null,
+      "id": null,
+      "field": "lineage_clade_name",
+      "accessor": "lineage_clade_name"
     },
     {
       "show": true,
@@ -49,8 +170,140 @@
       "query": null,
       "jsonPath": null,
       "id": null,
+      "field": "host.location_of_exposure_geo_loc_name_country",
+      "accessor": "host.location_of_exposure_geo_loc_name_country"
+    },
+    {
+      "show": true,
+      "type": "string",
+      "sortable": true,
+      "canChangeShow": true,
+      "query": null,
+      "jsonPath": null,
+      "id": null,
+      "field": "host.location_of_exposure_geo_loc_name_state_province_territory",
+      "accessor": "host.location_of_exposure_geo_loc_name_state_province_territory"
+    },
+    {
+      "show": true,
+      "type": "string",
+      "sortable": true,
+      "canChangeShow": true,
+      "query": null,
+      "jsonPath": null,
+      "id": null,
+      "field": "sample.sample_collection_date",
+      "accessor": "sample.sample_collection_date"
+    },
+    {
+      "show": true,
+      "type": "string",
+      "sortable": true,
+      "canChangeShow": true,
+      "query": null,
+      "jsonPath": null,
+      "id": null,
+      "field": "sample.sequencing_date",
+      "accessor": "sample.sequencing_date"
+    },
+    {
+      "show": true,
+      "type": "string",
+      "sortable": true,
+      "canChangeShow": true,
+      "query": null,
+      "jsonPath": null,
+      "id": null,
+      "field": "sample.sample_collected_by",
+      "accessor": "sample.sample_collected_by"
+    },
+    {
+      "show": true,
+      "type": "string",
+      "sortable": true,
+      "canChangeShow": true,
+      "query": null,
+      "jsonPath": null,
+      "id": null,
+      "field": "sample.geo_loc_name_country",
+      "accessor": "sample.geo_loc_name_country"
+    },
+    {
+      "show": true,
+      "type": "string",
+      "sortable": true,
+      "canChangeShow": true,
+      "query": null,
+      "jsonPath": null,
+      "id": null,
+      "field": "sample.geo_loc_name_state_province_territory",
+      "accessor": "sample.geo_loc_name_state_province_territory"
+    },
+    {
+      "show": true,
+      "type": "string",
+      "sortable": true,
+      "canChangeShow": true,
+      "query": null,
+      "jsonPath": null,
+      "id": null,
+      "field": "sample.collection_method",
+      "accessor": "sample.collection_method"
+    },
+    {
+      "show": true,
+      "type": "string",
+      "sortable": true,
+      "canChangeShow": true,
+      "query": null,
+      "jsonPath": null,
+      "id": null,
+      "field": "date_submitted",
+      "accessor": "date_submitted"
+    },
+    {
+      "show": true,
+      "type": "string",
+      "sortable": true,
+      "canChangeShow": true,
+      "query": null,
+      "jsonPath": null,
+      "id": null,
+      "field": "release_date",
+      "accessor": "release_date"
+    },
+    {
+      "show": true,
+      "type": "string",
+      "sortable": true,
+      "canChangeShow": true,
+      "query": null,
+      "jsonPath": null,
+      "id": null,
+      "field": "sequence_submitted_by",
+      "accessor": "sequence_submitted_by"
+    },
+    {
+      "show": true,
+      "type": "string",
+      "sortable": true,
+      "canChangeShow": true,
+      "query": null,
+      "jsonPath": null,
+      "id": null,
       "field": "sample.authors",
       "accessor": "sample.authors"
+    },
+    {
+      "show": true,
+      "type": "string",
+      "sortable": true,
+      "canChangeShow": true,
+      "query": null,
+      "jsonPath": null,
+      "id": null,
+      "field": "files.drs_filepath",
+      "accessor": "files.drs_filepath"
     }
   ]
 }

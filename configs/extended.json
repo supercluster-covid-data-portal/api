@@ -52,7 +52,7 @@
     "displayName": "Collections",
     "displayValues": {},
     "field": "collections",
-    "isArray": false,
+    "isArray": true,
     "primaryKey": false,
     "quickSearchEnabled": false,
     "rangeStep": 1,
@@ -73,7 +73,7 @@
   },
   {
     "active": false,
-    "displayName": "Collections Collection Name",
+    "displayName": "Collection Name",
     "displayValues": {},
     "field": "collections.collection_name",
     "isArray": false,
@@ -181,7 +181,7 @@
   },
   {
     "active": false,
-    "displayName": "Data Source Data Source Name",
+    "displayName": "Data Source",
     "displayValues": {},
     "field": "data_source.data_source_name",
     "isArray": false,
@@ -193,7 +193,7 @@
   },
   {
     "active": false,
-    "displayName": "Date Submitted",
+    "displayName": "Sequence Submitted Date",
     "displayValues": {},
     "field": "date_submitted",
     "isArray": false,
@@ -268,7 +268,7 @@
     "displayName": "Files",
     "displayValues": {},
     "field": "files",
-    "isArray": false,
+    "isArray": true,
     "primaryKey": false,
     "quickSearchEnabled": false,
     "rangeStep": 1,
@@ -277,7 +277,7 @@
   },
   {
     "active": false,
-    "displayName": "Files Drs Filepath",
+    "displayName": "DRS Filepath",
     "displayValues": {},
     "field": "files.drs_filepath",
     "isArray": false,
@@ -344,19 +344,19 @@
     "primaryKey": false,
     "quickSearchEnabled": false,
     "rangeStep": 1,
-    "type": "id",
+    "type": "keyword",
     "unit": null
   },
   {
     "active": false,
-    "displayName": "Gisaid Virus Name",
+    "displayName": "GISAID Virus Name",
     "displayValues": {},
     "field": "gisaid_virus_name",
     "isArray": false,
     "primaryKey": false,
     "quickSearchEnabled": false,
     "rangeStep": 1,
-    "type": "id",
+    "type": "text",
     "unit": null
   },
   {
@@ -505,7 +505,7 @@
   },
   {
     "active": false,
-    "displayName": "Host Host Age",
+    "displayName": "Host Age",
     "displayValues": {},
     "field": "host.host_age",
     "isArray": false,
@@ -541,7 +541,7 @@
   },
   {
     "active": false,
-    "displayName": "Host Host Common Name",
+    "displayName": "Host",
     "displayValues": {},
     "field": "host.host_common_name",
     "isArray": false,
@@ -553,7 +553,7 @@
   },
   {
     "active": false,
-    "displayName": "Host Host Disease",
+    "displayName": "Disease",
     "displayValues": {},
     "field": "host.host_disease",
     "isArray": false,
@@ -577,7 +577,7 @@
   },
   {
     "active": false,
-    "displayName": "Host Host Ethnicity",
+    "displayName": "Host Ethnicity",
     "displayValues": {},
     "field": "host.host_ethnicity",
     "isArray": false,
@@ -589,7 +589,7 @@
   },
   {
     "active": false,
-    "displayName": "Host Host Gender",
+    "displayName": "Host Gender",
     "displayValues": {},
     "field": "host.host_gender",
     "isArray": false,
@@ -601,7 +601,7 @@
   },
   {
     "active": false,
-    "displayName": "Host Host Health State",
+    "displayName": "Host Health State",
     "displayValues": {},
     "field": "host.host_health_state",
     "isArray": false,
@@ -644,43 +644,43 @@
     "primaryKey": false,
     "quickSearchEnabled": false,
     "rangeStep": 1,
-    "type": "id",
+    "type": "keyword",
     "unit": null
   },
   {
     "active": false,
-    "displayName": "Host Host Residence Geo Loc Name Country",
+    "displayName": "Host Country of Residence",
     "displayValues": {},
     "field": "host.host_residence_geo_loc_name_country",
     "isArray": false,
     "primaryKey": false,
     "quickSearchEnabled": false,
     "rangeStep": 1,
-    "type": "id",
+    "type": "text",
     "unit": null
   },
   {
     "active": false,
-    "displayName": "Host Host Residence Geo Loc Name County Region",
+    "displayName": "Host County/Region of Residence",
     "displayValues": {},
     "field": "host.host_residence_geo_loc_name_county_region",
     "isArray": false,
     "primaryKey": false,
     "quickSearchEnabled": false,
     "rangeStep": 1,
-    "type": "id",
+    "type": "keyword",
     "unit": null
   },
   {
     "active": false,
-    "displayName": "Host Host Residence Geo Loc Name State Province Territory",
+    "displayName": "Host State/Province/Territory of Residence",
     "displayValues": {},
     "field": "host.host_residence_geo_loc_name_state_province_territory",
     "isArray": false,
     "primaryKey": false,
     "quickSearchEnabled": false,
     "rangeStep": 1,
-    "type": "id",
+    "type": "text",
     "unit": null
   },
   {
@@ -692,7 +692,7 @@
     "primaryKey": false,
     "quickSearchEnabled": false,
     "rangeStep": 1,
-    "type": "id",
+    "type": "keyword",
     "unit": null
   },
   {
@@ -769,7 +769,7 @@
   },
   {
     "active": false,
-    "displayName": "Host Location Of Exposure Geo Loc Name Country",
+    "displayName": "Host Country of Exposure",
     "displayValues": {},
     "field": "host.location_of_exposure_geo_loc_name_country",
     "isArray": false,
@@ -781,7 +781,7 @@
   },
   {
     "active": false,
-    "displayName": "Host Location Of Exposure Geo Loc Name County Region",
+    "displayName": "Host County/Region of Exposure",
     "displayValues": {},
     "field": "host.location_of_exposure_geo_loc_name_county_region",
     "isArray": false,
@@ -793,7 +793,7 @@
   },
   {
     "active": false,
-    "displayName": "Host Location Of Exposure Geo Loc Name State Province Territory",
+    "displayName": "Host State/Province/Territory of Exposure",
     "displayValues": {},
     "field": "host.location_of_exposure_geo_loc_name_state_province_territory",
     "isArray": false,
@@ -1189,7 +1189,7 @@
   },
   {
     "active": false,
-    "displayName": "Release Date",
+    "displayName": "Sequence Release Date",
     "displayValues": {},
     "field": "release_date",
     "isArray": false,
@@ -1237,7 +1237,7 @@
   },
   {
     "active": false,
-    "displayName": "Sample Authors",
+    "displayName": "Authors",
     "displayValues": {},
     "field": "sample.authors",
     "isArray": false,
@@ -1501,7 +1501,7 @@
   },
   {
     "active": false,
-    "displayName": "Sample Geo Loc Name Country",
+    "displayName": "Sample Country of Collection",
     "displayValues": {},
     "field": "sample.geo_loc_name_country",
     "isArray": false,
@@ -1525,7 +1525,7 @@
   },
   {
     "active": false,
-    "displayName": "Sample Geo Loc Name State Province Territory",
+    "displayName": "Sample State/Province/Territory of Collection",
     "displayValues": {},
     "field": "sample.geo_loc_name_state_province_territory",
     "isArray": false,
@@ -1657,7 +1657,7 @@
   },
   {
     "active": false,
-    "displayName": "Sample Sample Collected By",
+    "displayName": "Sample Collected By",
     "displayValues": {},
     "field": "sample.sample_collected_by",
     "isArray": false,
@@ -1681,7 +1681,7 @@
   },
   {
     "active": false,
-    "displayName": "Sample Sample Collection Date",
+    "displayName": "Sample Collection Date",
     "displayValues": {},
     "field": "sample.sample_collection_date",
     "isArray": false,
