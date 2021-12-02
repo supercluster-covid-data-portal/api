@@ -3,7 +3,7 @@
   "keyField": "id",
   "defaultSorted": [
     {
-      "id": "sequence_id.keyword",
+      "id": "sequence_id",
       "desc": false
     }
   ],
