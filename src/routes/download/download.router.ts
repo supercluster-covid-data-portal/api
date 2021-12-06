@@ -3,16 +3,15 @@ import { get } from 'lodash';
 import JSZip from 'jszip';
 import moment from 'moment';
 
-import { SEQUENCES_ENDPOINT } from '../../constants/endpoint';
-import { downloadSequenceFiles } from './sequences.service';
+import { DOWNLOAD_SEQUENCES_ENDPOINT } from '../../constants/endpoint';
+import { downloadSequenceFiles } from './download.service';
 import logger from '../../logger';
 
 export const router: Router = Router();
 
-router.post(`${SEQUENCES_ENDPOINT}/download`, async (req: Request, res: Response) => {
+router.post(DOWNLOAD_SEQUENCES_ENDPOINT, async (req: Request, res: Response) => {
   const ids = get(req.body, 'ids', []);
   console.time('zip download');
-
   try {
     const assets = await downloadSequenceFiles(ids);
     const zip = new JSZip();

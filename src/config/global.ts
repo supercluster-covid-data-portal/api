@@ -46,6 +46,7 @@ export interface AppConfig {
     user: string;
     password: string;
     host: string;
+    index: string;
   };
 }
 
@@ -95,6 +96,7 @@ const buildAppConfig = async (secrets: Record<string, any> = {}): Promise<AppCon
       user: process.env.ES_USER || '',
       password: process.env.ES_PASS || '',
       host: process.env.ES_HOST || '',
+      index: process.env.ES_INDEX || 'sequence_centric',
     },
   };
 
