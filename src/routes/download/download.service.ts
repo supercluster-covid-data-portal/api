@@ -1,8 +1,10 @@
+import { get } from 'lodash';
+
 import getAppConfig from '../../config/global';
 import logger from '../../logger';
 import { getEsClient } from '@/esClient';
-import { get } from 'lodash';
 import { downloadFromAccessUrl, DRSMetada, fetchDRSMetadata, parseDRSPath } from './drs.service';
+import baseConfig from '../../../configs/base.json';
 
 const retrieveFiles = async (drsInfo: { sequenceId: string; drsPath: string }[]) => {
   // download the https access urls for each file
@@ -48,11 +50,11 @@ const retrieveFiles = async (drsInfo: { sequenceId: string; drsPath: string }[])
   return files;
 };
 
-const fetchSequenceData = async (ids: string[], index: string) => {
+const fetchSequenceData = async (ids: string[]) => {
   const esClient = await getEsClient();
   const response: any = await esClient
     .search({
-      index,
+      index: baseConfig.index,
       body: {
         query: {
           bool: {
@@ -85,7 +87,7 @@ const appendEmptySequence = (sequenceId: string, fileResults: any[]) =>
 
 export const downloadSequenceFiles = async (ids: string[]) => {
   const config = await getAppConfig();
-  const sequenceData = await fetchSequenceData(ids, config.es.index);
+  const sequenceData = await fetchSequenceData(ids);
   // if any download fails, the zip should not be attempted
   let fileResults = await Promise.all(
     sequenceData.map(async (result) => {
