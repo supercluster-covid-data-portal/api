@@ -42,6 +42,11 @@ export interface AppConfig {
   flag: {
     storageRootAdmin: boolean;
   };
+  es: {
+    user: string;
+    password: string;
+    host: string;
+  };
 }
 
 let config: AppConfig | undefined = undefined;
@@ -85,6 +90,11 @@ const buildAppConfig = async (secrets: Record<string, any> = {}): Promise<AppCon
     flag: {
       storageRootAdmin:
         (process.env.FLAG__STORAGE_ROOT_ADMIN || '').toLowerCase() === 'true' || false,
+    },
+    es: {
+      user: process.env.ES_USER || '',
+      password: process.env.ES_PASS || '',
+      host: process.env.ES_HOST || '',
     },
   };
 
