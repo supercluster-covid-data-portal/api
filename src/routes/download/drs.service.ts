@@ -1,5 +1,5 @@
 import urlJoin from 'url-join';
-import fetch from 'node-fetch';
+import axios from 'axios';
 
 import { AppConfig } from '@/config/global';
 import logger from '@/logger';
@@ -41,17 +41,18 @@ const getAccessUrl: (accessMethods: AccessMethod[]) => AccessMethod[] = (accessM
 };
 
 export const fetchDRSMetadata = async (drsUri: string) => {
-  const response = await fetch(drsUri)
+  const response = await axios
+    .get(drsUri)
     .then((res) => {
       if (res.status !== 200) {
         throw new Error(`Response from drs url failed with ${res.status} error.`);
       }
-      return res.json();
+      return res.data;
     })
-    .then((json) => {
+    .then((data) => {
       return {
-        accessUrls: getAccessUrl(json.access_methods),
-        name: json.name,
+        accessUrls: getAccessUrl(data.access_methods),
+        name: data.name,
       } as DRSMetada;
     })
     .catch((err) => {
@@ -62,9 +63,9 @@ export const fetchDRSMetadata = async (drsUri: string) => {
 };
 
 export const downloadFromAccessUrl = async (url: string) => {
-  const response = await fetch(url);
+  const response = await axios.get(url);
   if (response.status !== 200) {
     throw new Error(`Download from access url failed with ${response.status} error.`);
   }
-  return response.body;
+  return response.data;
 };

@@ -6,7 +6,6 @@ let esClient: Client;
 
 export async function getEsClient(): Promise<Client> {
   if (esClient) {
-    logger.info('ES client exists, returning...');
     return esClient;
   }
   logger.info('Creating ES client.');
