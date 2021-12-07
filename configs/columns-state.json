@@ -258,8 +258,8 @@
       "query": null,
       "jsonPath": null,
       "id": null,
-      "field": "date_submitted",
-      "accessor": "date_submitted"
+      "field": "sequence_submitted_date",
+      "accessor": "sequence_submitted_date"
     },
     {
       "show": true,
@@ -269,8 +269,8 @@
       "query": null,
       "jsonPath": null,
       "id": null,
-      "field": "release_date",
-      "accessor": "release_date"
+      "field": "sequence_release_date",
+      "accessor": "sequence_release_date"
     },
     {
       "show": true,
