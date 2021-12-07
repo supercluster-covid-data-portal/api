@@ -1,16 +1,17 @@
 import { Router } from 'express';
 
-import AuthRouter from './auth/auth.router';
-import HealthRouter from './health/health.router';
-import StorageRouter from './storage/storage.router';
+import authRouter from './auth/auth.router';
+import storageRouter from './storage/storage.router';
 
-const Routes = (): Router => {
+const routes = (): Router => {
   const router = Router();
 
-  router.use('/auth', AuthRouter);
-  router.use('/health', HealthRouter);
-  router.use('/storage', StorageRouter);
+  router.use('/auth', authRouter);
+  router.use('/storage', storageRouter);
 
   return router;
 };
-export default Routes;
+
+export default routes;
+
+export { default as healthRouter } from './health/health.router';

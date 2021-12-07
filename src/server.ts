@@ -4,9 +4,9 @@ import express from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
 
-import { ARRANGER_READY_ENDPOINT, BASE_ENDPOINT } from './constants/endpoint';
+import { BASE_ENDPOINT, HEALTH_ENDPOINT } from './constants/endpoint';
 import logger from './logger';
-import Routes from './routes';
+import apiRoutes, { healthRouter } from './routes';
 
 const app = express();
 
@@ -26,7 +26,16 @@ app.use(
 );
 
 // Handle logs in console during development
-app.use(morgan('dev'));
+app.use(
+  morgan('dev', {
+    skip: (req, res) => {
+      // logs everything but health checks on dev, errors only otherwise
+      return process.env.NODE_ENV === 'development' || process.env.DEBUG === 'true'
+        ? req.originalUrl.includes(HEALTH_ENDPOINT)
+        : res.statusCode < 400;
+    },
+  }),
+);
 
 // Handle security and origin in production
 if (process.env.NODE_ENV === 'production') {
@@ -37,8 +46,9 @@ if (process.env.NODE_ENV === 'production') {
 /************************************************************************************
  *                               Register all routes
  ***********************************************************************************/
-const routes = Routes();
-app.use(BASE_ENDPOINT, routes);
+
+app.use(BASE_ENDPOINT, apiRoutes());
+app.use(HEALTH_ENDPOINT, healthRouter);
 
 /************************************************************************************
  *                               Express Error Handling

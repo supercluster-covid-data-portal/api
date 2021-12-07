@@ -5,12 +5,12 @@ require('dotenv').config({
 import Arranger from '@caravinci/arranger-server';
 import { Router } from 'express';
 
-import { BASE_ENDPOINT } from './constants/endpoint';
+import { BASE_ENDPOINT, HEALTH_ENDPOINT } from './constants/endpoint';
 import app from './server';
 
 const port = Number(process.env.PORT || 4000);
 
-Arranger().then((arrangerRouter: Router) => {
+Arranger({ pingPath: HEALTH_ENDPOINT }).then((arrangerRouter: Router) => {
   app.use(BASE_ENDPOINT, arrangerRouter);
 
   app.listen(port, () => {

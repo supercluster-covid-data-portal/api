@@ -1,3 +1,2 @@
 export const BASE_ENDPOINT = '/api';
-
-export const ARRANGER_READY_ENDPOINT = '/ping';
+export const HEALTH_ENDPOINT = '/health';
