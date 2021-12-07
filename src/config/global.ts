@@ -19,10 +19,10 @@
 
 import urlJoin from 'url-join';
 
-import { JWKS_ENDPOINT } from '../constants/endpoint';
 import logger from '../logger';
 import * as vault from './vault';
 
+const JWKS_URI_PATH = '/oauth/jwks';
 interface AppConfig {
   auth: {
     apiRootUrl: string;
@@ -64,7 +64,7 @@ const buildAppConfig = async (secrets: Record<string, any> = {}): Promise<AppCon
   config = {
     auth: {
       apiRootUrl: process.env.AUTH_API_ROOT || '',
-      jwksUri: process.env.AUTH_API_ROOT ? urlJoin(process.env.AUTH_API_ROOT, JWKS_ENDPOINT) : '',
+      jwksUri: process.env.AUTH_API_ROOT ? urlJoin(process.env.AUTH_API_ROOT, JWKS_URI_PATH) : '',
       clientId: process.env.AUTH_CLIENT_ID || '',
       clientSecret: secrets.AUTH_CLIENT_SECRET || process.env.AUTH_CLIENT_SECRET || '',
       sessionDuration: Number(process.env.AUTH_SESSION_DURATION) || 1800000,

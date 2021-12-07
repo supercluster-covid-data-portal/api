@@ -25,8 +25,7 @@ import { AUTH_ENDPOINT } from '../../constants/endpoint';
 import logger from '../../logger';
 import { extractUser, fetchAuthToken, fetchUserInfo } from './auth.service';
 
-export const path: string = AUTH_ENDPOINT;
-export const router: Router = Router();
+const router: Router = Router();
 
 router.post('/token', async (req: Request, res: Response) => {
   try {
@@ -78,3 +77,5 @@ router.get('/user-info', async (req: Request, res: Response, next: NextFunction)
     return next(error);
   }
 });
+
+export default router;
