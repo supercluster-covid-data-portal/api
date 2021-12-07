@@ -1,8 +1,6 @@
 import { NextFunction, Request, Response, Router } from 'express';
-import urlJoin from 'url-join';
 
 import getAppConfig from '@/config/global';
-import { STORAGE_ENDPOINT } from '@/constants/endpoint';
 
 import { STORAGE_TYPES } from './constants';
 import queryRouter from './query';
