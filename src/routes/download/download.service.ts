@@ -87,6 +87,9 @@ const appendEmptySequence = (sequenceId: string, fileResults: any[]) =>
 
 export const downloadSequenceFiles = async (ids: string[]) => {
   const config = await getAppConfig();
+  if (!ids.length || ids.length > config.download.sequences_limit) {
+    throw new Error('Invalid number of sequences requested for download!');
+  }
   const sequenceData = await fetchSequenceData(ids);
   // if any download fails, the zip should not be attempted
   let fileResults = await Promise.all(

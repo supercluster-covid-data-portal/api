@@ -47,6 +47,9 @@ export interface AppConfig {
     password: string;
     host: string;
   };
+  download: {
+    sequences_limit: number;
+  };
 }
 
 let config: AppConfig | undefined = undefined;
@@ -95,6 +98,9 @@ const buildAppConfig = async (secrets: Record<string, any> = {}): Promise<AppCon
       user: process.env.ES_USER || '',
       password: process.env.ES_PASS || '',
       host: process.env.ES_HOST || '',
+    },
+    download: {
+      sequences_limit: Number(process.env.SEQ_FILE_DOWNLOAD_LIMIT) || 10,
     },
   };
 
