@@ -6,11 +6,26 @@ import moment from 'moment';
 import { DOWNLOAD_SEQUENCES_ENDPOINT } from '../../constants/endpoint';
 import { downloadSequenceFiles } from './download.service';
 import logger from '../../logger';
+import getAppConfig from '@/config/global';
 
 export const router: Router = Router();
 
 router.post(DOWNLOAD_SEQUENCES_ENDPOINT, async (req: Request, res: Response) => {
   const ids = get(req.body, 'ids', []);
+  const config = await getAppConfig();
+
+  if (ids.length === 0) {
+    return res.status(400).send('No sequence ids were provided.');
+  }
+
+  if (ids.length > config.download.sequences_limit) {
+    return res
+      .status(400)
+      .send(
+        `Number of sequence ids provided [${ids.length}] exceeds max allowed [${config.download.sequences_limit}].`,
+      );
+  }
+
   console.time('zip download');
   try {
     const assets = await downloadSequenceFiles(ids);
