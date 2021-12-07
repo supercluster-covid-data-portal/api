@@ -9,14 +9,3 @@ router.get('/', (req, res) => {
     status: 'API Server is running...',
   });
 });
-
-// getRoutes
-router.get('/routes', (req, res) => {
-  const routes = getRoutes();
-
-  res.status(200).send({
-    numberOfRoutes: routes.length,
-    routes: routes,
-  });
-});
-export default router;
