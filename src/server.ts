@@ -4,7 +4,7 @@ import express from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
 
-import { ARRANGER_READY_ENDPOINT, BASE_ENDPOINT, HEALTH_ENDPOINT } from './constants/endpoint';
+import { ARRANGER_READY_ENDPOINT, BASE_ENDPOINT } from './constants/endpoint';
 import logger from './logger';
 import Routes from './routes';
 
@@ -26,16 +26,7 @@ app.use(
 );
 
 // Handle logs in console during development
-app.use(
-  morgan('dev', {
-    skip: (req, res) => {
-      // logs everything but health checks on dev, errors only otherwise
-      return process.env.NODE_ENV === 'development' || process.env.DEBUG === 'true'
-        ? [ARRANGER_READY_ENDPOINT, HEALTH_ENDPOINT].includes(req.originalUrl)
-        : res.statusCode < 400;
-    },
-  }),
-);
+app.use(morgan('dev'));
 
 // Handle security and origin in production
 if (process.env.NODE_ENV === 'production') {
