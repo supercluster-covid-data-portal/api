@@ -57,7 +57,9 @@ router.post('/token', async (req: Request, res: Response) => {
 
     return res.status(400).send('Missing parameters');
   } catch (error) {
-    logger.error(error);
+    if (error instanceof Error) {
+      logger.debug(`Could not retrieve token: ${error.message}`);
+    }
     return res.status(500).send('Login failed');
   }
 });
@@ -75,7 +77,9 @@ router.get('/user-info', async (req: Request, res: Response, next: NextFunction)
 
     return res.status(401).send('Please login');
   } catch (error) {
-    logger.error(error);
+    if (error instanceof Error) {
+      logger.debug(`Could not get user info: `, error);
+    }
     return next(error);
   }
 });

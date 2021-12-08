@@ -36,16 +36,16 @@ router.post(DOWNLOAD_SEQUENCES_ENDPOINT, async (req: Request, res: Response) => 
       .generateNodeStream({ type: 'nodebuffer', streamFiles: true })
       .pipe(res)
       .on('error', (err) => {
-        logger.info(`Error in zip stream: ${err}`);
+        logger.debug(`Error in zip stream: ${err}`);
         res.status(500).write(err);
       })
       .on('finish', () => {
-        logger.info(`Zip completed, sending response.`);
+        logger.debug(`Zip completed, sending response.`);
         console.timeEnd('zip download');
         res.status(200).send();
       });
   } catch (error) {
-    logger.error(`Error handling sequence file download: ${error}`);
+    logger.debug(`Error handling sequence file download: ${error}`);
     // https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-0.html#unknown-on-catch-clause-bindings
     if (error instanceof Error) {
       return res.status(400).send(error.message);

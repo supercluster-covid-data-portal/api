@@ -63,7 +63,7 @@ export const downloadSequenceFiles = async (ids: string[]) => {
 
   // if no files are found for any of the sequence ids we will send an error to the ui
   if (fileResults.every((res) => res.files.length === 0)) {
-    logger.info('No files found for the requested sequence ids.');
+    logger.debug('No files found for the requested sequence ids.');
     throw new Error('No files found.');
   }
   ids.map((id) => {
@@ -73,7 +73,7 @@ export const downloadSequenceFiles = async (ids: string[]) => {
       fileResults = appendEmptySequence(id, fileResults);
     }
   });
-  logger.info(`Successfully retrieved files.`);
+  logger.debug(`Successfully retrieved files.`);
   return fileResults;
 };
 
@@ -88,7 +88,7 @@ export const buildSequenceAssets = async (ids: string[]) => {
     await Promise.all(
       asset.files.map((file) => {
         if (file) {
-          logger.info(`Writing file ${file.name} to zip folder ${sequenceId}`);
+          logger.debug(`Writing file ${file.name} to zip folder ${sequenceId}`);
           zip.file(`${sequenceId}/${file.name}`, file.stream);
         }
       }),

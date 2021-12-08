@@ -51,7 +51,7 @@ export const validateJwt: (jwt: string) => Promise<boolean> = async (jwt) => {
 
   // if existing kid does not match incoming from jwt, update
   if (kidFromJwt !== kid) {
-    logger.info('Resetting kid from jwt...');
+    logger.debug('Resetting kid from jwt...');
     const newPubKey = await fetchPublicKey(kidFromJwt); // need error handling
     kid = kidFromJwt;
     pubkey = newPubKey;
@@ -97,8 +97,6 @@ export const fetchAuthToken = async (
 
   const encoded = Buffer.from(credentials).toString('base64');
 
-  logger.info('Calling oauth API to get tokens');
-
   const tokenResponse: TokenResponseData = await axios
     .post(
       loginUrl.href,
@@ -116,7 +114,7 @@ export const fetchAuthToken = async (
       throw new Error(`Auth token response is not OK: ${res.status}`);
     })
     .catch((error: AxiosError) => {
-      logger.warn('Token fetch failed, unable to login.');
+      logger.debug('Token fetch failed, unable to login.');
       throw error;
     });
 
@@ -158,7 +156,7 @@ export const fetchUserInfo = async (token: string) => {
       throw new Error('Not authenticated, cannot fetch user info');
     })
     .catch((err: AxiosError) => {
-      logger.warn('Error fetching user info');
+      logger.debug('Error fetching user info');
       return err;
     });
 

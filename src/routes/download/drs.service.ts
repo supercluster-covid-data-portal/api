@@ -54,7 +54,7 @@ export const fetchDRSMetadata = async (drsUri: string) => {
       } as DRSMetada;
     })
     .catch((err) => {
-      logger.info(`Error fetching metadata: ${err}`);
+      logger.debug(`Error fetching metadata: ${err}`);
       throw err;
     });
   return response;
