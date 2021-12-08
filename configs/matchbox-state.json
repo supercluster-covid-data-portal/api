@@ -1,0 +1,10 @@
+[
+  {
+    "displayName": "file",
+    "field": "",
+    "isActive": false,
+    "keyField": null,
+    "searchFields": [],
+    "__typename": "MatchBoxField"
+  }
+]

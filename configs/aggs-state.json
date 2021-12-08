@@ -1,0 +1,142 @@
+[
+  {
+    "field": "data_source__data_source_name",
+    "active": true,
+    "show": true
+  },
+  {
+    "field": "collections__collection_name",
+    "active": true,
+    "show": true
+  },
+  {
+    "field": "host__host_common_name",
+    "active": true,
+    "show": true
+  },
+  {
+    "field": "host__host_age",
+    "active": true,
+    "show": true
+  },
+  {
+    "field": "host__host_age_bin",
+    "active": true,
+    "show": true
+  },
+  {
+    "field": "host__host_gender",
+    "active": true,
+    "show": true
+  },
+  {
+    "field": "host__host_ethnicity",
+    "active": true,
+    "show": true
+  },
+  {
+    "field": "host__host_health_state",
+    "active": true,
+    "show": true
+  },
+  {
+    "field": "host__host_residence_geo_loc_name_country",
+    "active": true,
+    "show": true
+  },
+  {
+    "field": "host__host_residence_geo_loc_name_state_province_territory",
+    "active": true,
+    "show": true
+  },
+  {
+    "field": "host__host_residence_geo_loc_name_county_region",
+    "active": true,
+    "show": true
+  },
+  {
+    "field": "host__host_disease",
+    "active": true,
+    "show": true
+  },
+  {
+    "field": "gisaid_virus_name",
+    "active": true,
+    "show": true
+  },
+  {
+    "field": "lineage_clade_name",
+    "active": true,
+    "show": true
+  },
+  {
+    "field": "variant_designation",
+    "active": true,
+    "show": true
+  },
+  {
+    "field": "host__location_of_exposure_geo_loc_name_country",
+    "active": true,
+    "show": true
+  },
+  {
+    "field": "host__location_of_exposure_geo_loc_name_state_province_territory",
+    "active": true,
+    "show": true
+  },
+  {
+    "field": "host__location_of_exposure_geo_loc_name_county_region",
+    "active": true,
+    "show": true
+  },
+  {
+    "field": "sample__sample_collection_date",
+    "active": true,
+    "show": true
+  },
+  {
+    "field": "sample__sequencing_date",
+    "active": true,
+    "show": true
+  },
+  {
+    "field": "sample__sample_collected_by",
+    "active": true,
+    "show": true
+  },
+  {
+    "field": "sample__geo_loc_name_country",
+    "active": true,
+    "show": true
+  },
+  {
+    "field": "sample__geo_loc_name_state_province_territory",
+    "active": true,
+    "show": true
+  },
+  {
+    "field": "sample__geo_loc_name_county_region",
+    "active": true,
+    "show": true
+  },
+  {
+    "field": "sample__collection_method",
+    "active": true,
+    "show": true
+  },
+  {
+    "field": "date_submitted",
+    "active": true,
+    "show": true
+  },
+  {
+    "field": "release_date",
+    "active": true,
+    "show": true
+  },
+  {
+    "field": "sequence_submitted_by",
+    "active": true,
+    "show": true
+  }
+]

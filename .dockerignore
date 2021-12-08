@@ -1,0 +1,14 @@
+**/.cache
+**/.DS_Store
+**/.git
+**/.gitignore
+**/config.*
+**/dist
+**/env
+**/logs
+**/node_modules
+**/rsa
+*.md
+
+Dockerfile
+.dockerignore

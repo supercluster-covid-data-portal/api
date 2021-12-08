@@ -1,11 +1,15 @@
 import { Router } from 'express';
-import { SERVER_STATUS_ENDPOINT } from '../../constants/endpoint';
-import { getRoutes } from './server.status.service';
+import { HEALTH_ENDPOINT } from '../../constants/endpoint';
+import { getRoutes } from './health.service';
 
 export const router: Router = Router();
 
 // getStatus
 router.get('/', (req, res) => {
+  res.status(200).send();
+});
+
+router.get(HEALTH_ENDPOINT, (req, res) => {
   res.status(200).send({
     status: 'API Server is running...',
   });
