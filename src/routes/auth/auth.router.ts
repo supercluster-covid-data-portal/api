@@ -35,7 +35,7 @@ router.post('/token', async (req: Request, res: Response) => {
 
     if (code) {
       const tokens = await fetchAuthToken(code);
-      const config = await getAppConfig();
+      const config = getAppConfig();
       const domain = new URL(config.client.domain);
 
       const cookieConfig: CookieOptions = {
@@ -64,7 +64,7 @@ router.post('/token', async (req: Request, res: Response) => {
 
 router.get('/user-info', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const config = await getAppConfig();
+    const config = getAppConfig();
     const token = req.cookies[config.auth.sessionTokenKey];
 
     if (token) {

@@ -86,7 +86,7 @@ const appendEmptySequence = (sequenceId: string, fileResults: any[]) =>
   fileResults.concat({ sequenceId, files: [] });
 
 export const downloadSequenceFiles = async (ids: string[]) => {
-  const config = await getAppConfig();
+  const config = getAppConfig();
   if (!ids.length || ids.length > config.download.sequences_limit) {
     throw new Error('Invalid number of sequences requested for download!');
   }

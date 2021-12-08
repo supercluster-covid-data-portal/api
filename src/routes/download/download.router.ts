@@ -12,7 +12,7 @@ export const router: Router = Router();
 
 router.post(DOWNLOAD_SEQUENCES_ENDPOINT, async (req: Request, res: Response) => {
   const ids = get(req.body, 'ids', []);
-  const config = await getAppConfig();
+  const config = getAppConfig();
 
   if (ids.length === 0) {
     return res.status(400).send('No sequence ids were provided.');

@@ -23,12 +23,17 @@ import { JWKS_ENDPOINT } from '../constants/endpoint';
 import logger from '../logger';
 import * as vault from './vault';
 
+export interface AppSecrets {
+  auth: {
+    clientSecret: string;
+  };
+}
+
 export interface AppConfig {
   auth: {
     apiRootUrl: string;
     jwksUri: string;
     clientId: string;
-    clientSecret: string;
     sessionDuration: number;
     sessionTokenKey: string;
   };
@@ -52,7 +57,7 @@ export interface AppConfig {
   };
 }
 
-let config: AppConfig | undefined = undefined;
+let appSecrets: AppSecrets | undefined = undefined;
 
 const vaultEnabled = (process.env.VAULT_ENABLED || '').toLowerCase() === 'true';
 
@@ -71,15 +76,34 @@ const loadVaultSecrets = async () => {
   }
 };
 
-const buildAppConfig = async (secrets: Record<string, any> = {}): Promise<AppConfig> => {
-  logger.info('Building app config...');
+const buildAppSecrets = async (secrets: Record<string, any> = {}): Promise<AppSecrets> => {
+  logger.info('Building app secrets...');
 
-  config = {
+  appSecrets = {
+    auth: {
+      clientSecret: secrets.AUTH_CLIENT_SECRET || process.env.AUTH_CLIENT_SECRET || '',
+    },
+  };
+  return appSecrets;
+};
+
+export const getAppSecrets = async () => {
+  if (appSecrets !== undefined) {
+    return appSecrets;
+  }
+  if (vaultEnabled) {
+    const secrets = await loadVaultSecrets();
+    return buildAppSecrets(secrets);
+  }
+  return buildAppSecrets();
+};
+
+const getAppConfig = (): AppConfig => {
+  return {
     auth: {
       apiRootUrl: process.env.AUTH_API_ROOT || '',
       jwksUri: process.env.AUTH_API_ROOT ? urlJoin(process.env.AUTH_API_ROOT, JWKS_ENDPOINT) : '',
       clientId: process.env.AUTH_CLIENT_ID || '',
-      clientSecret: secrets.AUTH_CLIENT_SECRET || process.env.AUTH_CLIENT_SECRET || '',
       sessionDuration: Number(process.env.AUTH_SESSION_DURATION) || 1800000,
       sessionTokenKey: process.env.AUTH_SESSION_TOKEN_KEY || '',
     },
@@ -103,22 +127,6 @@ const buildAppConfig = async (secrets: Record<string, any> = {}): Promise<AppCon
       sequences_limit: Number(process.env.SEQ_FILE_DOWNLOAD_LIMIT) || 10,
     },
   };
-
-  return config;
-};
-
-const getAppConfig = async (envFile?: string): Promise<AppConfig> => {
-  if (config != undefined) {
-    return config;
-  }
-
-  if (vaultEnabled) {
-    const secrets = await loadVaultSecrets();
-
-    return buildAppConfig(secrets);
-  }
-
-  return buildAppConfig();
 };
 
 export default getAppConfig;

@@ -27,7 +27,7 @@ export const fetchStorage = async ({
     ...(tokenBearer && { Authorization: tokenBearer }),
   };
 
-  const config = await getAppConfig();
+  const config = getAppConfig();
   const url = `${config.auth.apiRootUrl}/clients/${config.auth.clientId}/users/${userId}/properties/`;
 
   return axios({

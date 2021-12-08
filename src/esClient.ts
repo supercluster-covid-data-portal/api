@@ -9,7 +9,7 @@ export async function getEsClient(): Promise<Client> {
     return esClient;
   }
   logger.info('Creating ES client.');
-  const config = await getAppConfig();
+  const config = getAppConfig();
   // define auth for client, if set in env
   const auth =
     config.es.user && config.es.password
