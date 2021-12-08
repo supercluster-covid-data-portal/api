@@ -3,54 +3,13 @@ import { get } from 'lodash';
 import getAppConfig from '../../config/global';
 import logger from '../../logger';
 import { getEsClient } from '@/esClient';
-import { downloadFromAccessUrl, DRSMetada, fetchDRSMetadata, parseDRSPath } from './drs.service';
+import { downloadFilesFromDRS } from './drs.service';
 import baseConfig from '../../../configs/base.json';
+import JSZip from 'jszip';
+import { SequenceResult } from './types';
 
-const retrieveFiles = async (drsInfo: { sequenceId: string; drsPath: string }[]) => {
-  // download the https access urls for each file
-  const sequenceInfo = await Promise.all(
-    drsInfo.map(async (drsUrl) => {
-      const accessUrlInfo = await fetchDRSMetadata(drsUrl.drsPath);
-      return {
-        sequenceId: drsUrl.sequenceId,
-        accessUrlInfo,
-      };
-    }),
-  );
-
-  const downloaded = sequenceInfo.map(
-    async (sequence: { sequenceId: string; accessUrlInfo: DRSMetada }) => {
-      try {
-        // retrieve file from access url
-        // return from first url that resolves
-        const stream = (await Promise.any(
-          sequence.accessUrlInfo.accessUrls.map((u: any) =>
-            downloadFromAccessUrl(u.access_url.url),
-          ),
-        )) as unknown as NodeJS.ReadableStream;
-        logger.info(`returning stream for ${sequence.accessUrlInfo.name}`);
-        return {
-          name: sequence.accessUrlInfo.name,
-          stream,
-        };
-      } catch (err) {
-        if (err instanceof AggregateError) {
-          logger.error(
-            `Multiple errors reported downloading from access url for ${sequence.sequenceId}: ${err.errors}`,
-          );
-          throw err.errors[0];
-        } else {
-          logger.error(`Error on ${sequence.sequenceId}: ${err}`);
-          throw err;
-        }
-      }
-    },
-  );
-  const files = await Promise.all(downloaded);
-  return files;
-};
-
-const fetchSequenceData = async (ids: string[]) => {
+type FetchSequenceDataFunc = (ids: string[]) => Promise<SequenceResult[]>;
+const fetchSequenceData: FetchSequenceDataFunc = async (ids: string[]) => {
   const esClient = await getEsClient();
   const response: any = await esClient
     .search({
@@ -72,8 +31,8 @@ const fetchSequenceData = async (ids: string[]) => {
       throw new Error('ES query failed, cannot retrieve sequence file info.');
     });
 
-  const queryResults: any[] = get(response, 'body.hits.hits', []).map((result: any) => {
-    const files = get(result, '_source.files');
+  const queryResults: SequenceResult[] = get(response, 'body.hits.hits', []).map((result: any) => {
+    const files = get(result, '_source.files', []);
     return {
       sequenceId: get(result, '_id'),
       files,
@@ -93,17 +52,11 @@ export const downloadSequenceFiles = async (ids: string[]) => {
   const sequenceData = await fetchSequenceData(ids);
   // if any download fails, the zip should not be attempted
   let fileResults = await Promise.all(
-    sequenceData.map(async (result) => {
-      // construct url from drs_filepath info
-      const fileInfo = result.files.map((f: any) => ({
-        sequenceId: result.sequenceId,
-        drsPath: parseDRSPath(f.drs_filepath, config),
-      }));
-
-      const files = await retrieveFiles(fileInfo);
+    sequenceData.map(async (seq) => {
+      const downloadedFiles = await downloadFilesFromDRS(seq);
       return {
-        sequenceId: result.sequenceId,
-        files,
+        sequenceId: seq.sequenceId,
+        files: downloadedFiles,
       };
     }),
   );
@@ -122,4 +75,24 @@ export const downloadSequenceFiles = async (ids: string[]) => {
   });
   logger.info(`Successfully retrieved files.`);
   return fileResults;
+};
+
+export const buildSequenceAssets = async (ids: string[]) => {
+  const assets = await downloadSequenceFiles(ids);
+  const zip = new JSZip();
+  await assets.map(async (asset) => {
+    const sequenceId = (await asset).sequenceId;
+    // writing the files to a separate folder for each sequence id
+    // if there are no files for an individual id, the folder is created but will be empty so the user is aware
+    zip.folder(sequenceId);
+    await Promise.all(
+      asset.files.map((file) => {
+        if (file) {
+          logger.info(`Writing file ${file.name} to zip folder ${sequenceId}`);
+          zip.file(`${sequenceId}/${file.name}`, file.stream);
+        }
+      }),
+    );
+  });
+  return zip;
 };

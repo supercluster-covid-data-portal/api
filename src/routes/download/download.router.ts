@@ -1,10 +1,9 @@
 import { Request, Response, Router } from 'express';
 import { get } from 'lodash';
-import JSZip from 'jszip';
 import moment from 'moment';
 
 import { DOWNLOAD_SEQUENCES_ENDPOINT } from '../../constants/endpoint';
-import { downloadSequenceFiles } from './download.service';
+import { buildSequenceAssets } from './download.service';
 import logger from '../../logger';
 import getAppConfig from '@/config/global';
 
@@ -28,22 +27,7 @@ router.post(DOWNLOAD_SEQUENCES_ENDPOINT, async (req: Request, res: Response) => 
 
   console.time('zip download');
   try {
-    const assets = await downloadSequenceFiles(ids);
-    const zip = new JSZip();
-    await assets.map(async (asset) => {
-      const sequenceId = (await asset).sequenceId;
-      // writing the files to a separate folder for each sequence id
-      // if there are no files for an individual id, the folder is created but will be empty so the user is aware
-      zip.folder(sequenceId);
-      await Promise.all(
-        asset.files.map((file) => {
-          if (file) {
-            logger.info(`Writing file ${file.name} to zip folder ${sequenceId}`);
-            zip.file(`${sequenceId}/${file.name}`, file.stream);
-          }
-        }),
-      );
-    });
+    const zip = await buildSequenceAssets(ids);
     const zipName = `sequence_files_${moment().format('YYYY-MM-DDTHH:mm')}.zip`;
     res.set('Content-Type', 'application/zip');
     res.attachment(zipName);
@@ -61,7 +45,7 @@ router.post(DOWNLOAD_SEQUENCES_ENDPOINT, async (req: Request, res: Response) => 
         res.status(200).send();
       });
   } catch (error) {
-    logger.error(`Error downloading zip file: ${error}`);
+    logger.error(`Error handling sequence file download: ${error}`);
     // https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-0.html#unknown-on-catch-clause-bindings
     if (error instanceof Error) {
       return res.status(400).send(error.message);
