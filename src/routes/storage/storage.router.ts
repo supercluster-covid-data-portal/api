@@ -9,8 +9,7 @@ import queryRouter from './query';
 import { StorageTypes } from './types';
 import { fetchStorage, nukeStorage } from './utils';
 
-export const path = STORAGE_ENDPOINT;
-export const router: Router = Router({
+const router: Router = Router({
   mergeParams: true,
 });
 
@@ -79,3 +78,5 @@ storageRoute.delete(async (req: Request, res: Response, next: NextFunction) => {
     next(error);
   }
 });
+
+export default router;

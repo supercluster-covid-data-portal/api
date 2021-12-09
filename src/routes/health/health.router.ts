@@ -2,14 +2,9 @@ import { Router } from 'express';
 import { HEALTH_ENDPOINT } from '../../constants/endpoint';
 import { getRoutes } from './health.service';
 
-export const router: Router = Router();
+const router: Router = Router();
 
-// getStatus
 router.get('/', (req, res) => {
-  res.status(200).send();
-});
-
-router.get(HEALTH_ENDPOINT, (req, res) => {
   res.status(200).send({
     status: 'API Server is running...',
   });
@@ -24,3 +19,4 @@ router.get('/routes', (req, res) => {
     routes: routes,
   });
 });
+export default router;

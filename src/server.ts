@@ -1,14 +1,14 @@
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import express, { Express } from 'express';
+import express from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
 
-import { ARRANGER_READY_ENDPOINT, HEALTH_ENDPOINT } from './constants/endpoint';
+import { ARRANGER_READY_ENDPOINT, BASE_ENDPOINT, HEALTH_ENDPOINT } from './constants/endpoint';
 import logger from './logger';
-import { getFilesWithKeyword } from './utils/getFilesWithKeyword';
+import Routes from './routes';
 
-const app: Express = express();
+const app = express();
 
 /************************************************************************************
  *                              Basic Express Middlewares
@@ -46,14 +46,8 @@ if (process.env.NODE_ENV === 'production') {
 /************************************************************************************
  *                               Register all routes
  ***********************************************************************************/
-
-getFilesWithKeyword('router', __dirname + '/routes').forEach((file: string) => {
-  const { path = '/', router } = require(file);
-
-  router
-    ? app.use(path, router)
-    : console.warn(`${file} doesn't seen to export a 'router', expected at ${path}`);
-});
+const routes = Routes();
+app.use(BASE_ENDPOINT, routes);
 
 /************************************************************************************
  *                               Express Error Handling
