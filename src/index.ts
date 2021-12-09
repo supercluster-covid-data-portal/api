@@ -3,9 +3,11 @@ require('dotenv').config({
 });
 
 import Arranger from '@caravinci/arranger-server';
+import { Client } from '@elastic/elasticsearch';
 import { Router } from 'express';
 
 import { BASE_ENDPOINT } from './constants/endpoint';
+import { getEsClient } from './esClient';
 import app from './server';
 
 const port = Number(process.env.PORT || 4000);
@@ -22,3 +24,6 @@ Arranger().then((arrangerRouter: Router) => {
     console.info(`${line}\n`);
   });
 });
+
+// init elasticsearch
+getEsClient();

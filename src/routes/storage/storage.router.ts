@@ -26,7 +26,7 @@ router.use(`/${StorageTypes.STORED_QUERIES}`, queryRouter);
 const storageRoute = router.route('/:storageType?');
 
 storageRoute.all(async (req: Request, res: Response, next: NextFunction) => {
-  const config = await getAppConfig();
+  const config = getAppConfig();
   const storageType = req.params.storageType?.toLowerCase() as StorageTypes;
   const tokenBearer = req.header('Authorization') || '';
   const userId = req.header('UserID') || '';
