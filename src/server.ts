@@ -4,9 +4,9 @@ import express from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
 
-import { BASE_ENDPOINT, HEALTH_ENDPOINT } from './constants/endpoint';
+import { BASE_ENDPOINT, HEALTH_ENDPOINT, SWAGGER_ENDPOINT } from './constants/endpoint';
 import logger from './logger';
-import apiRoutes, { healthRouter } from './routes';
+import apiRoutes, { healthRouter, swaggerRouter } from './routes';
 
 const app = express();
 
@@ -49,6 +49,7 @@ if (process.env.NODE_ENV === 'production') {
 
 app.use(BASE_ENDPOINT, apiRoutes());
 app.use(HEALTH_ENDPOINT, healthRouter);
+app.use(SWAGGER_ENDPOINT, swaggerRouter);
 
 /************************************************************************************
  *                               Express Error Handling
