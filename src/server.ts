@@ -49,7 +49,7 @@ if (process.env.NODE_ENV === 'production') {
 
 app.use(BASE_ENDPOINT, apiRoutes());
 app.use(HEALTH_ENDPOINT, healthRouter);
-app.use(SWAGGER_ENDPOINT, swaggerRouter);
+// app.use(SWAGGER_ENDPOINT, swaggerRouter);
 
 /************************************************************************************
  *                               Express Error Handling
