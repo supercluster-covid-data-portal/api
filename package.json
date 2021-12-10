@@ -1,6 +1,6 @@
 {
   "name": "supercluster_data_portal_api",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Data Access Control API",
   "main": "src/index.ts",
   "scripts": {
