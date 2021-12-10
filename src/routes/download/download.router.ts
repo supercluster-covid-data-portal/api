@@ -2,14 +2,13 @@ import { Request, Response, Router } from 'express';
 import { get } from 'lodash';
 import moment from 'moment';
 
-import { DOWNLOAD_SEQUENCES_ENDPOINT } from '../../constants/endpoint';
 import { buildSequenceAssets } from './download.service';
 import logger from '../../logger';
 import getAppConfig from '@/config/global';
 
-export const router: Router = Router();
+const router: Router = Router();
 
-router.post(DOWNLOAD_SEQUENCES_ENDPOINT, async (req: Request, res: Response) => {
+router.post('/', async (req: Request, res: Response) => {
   const ids = get(req.body, 'ids', []);
   const config = getAppConfig();
 
@@ -53,3 +52,5 @@ router.post(DOWNLOAD_SEQUENCES_ENDPOINT, async (req: Request, res: Response) => 
     return res.status(400).send('An unknown error occurred.');
   }
 });
+
+export default router;
