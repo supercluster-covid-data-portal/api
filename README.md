@@ -31,10 +31,19 @@ Now you should be able to start the server from the project's root folder:
 
 ```bash
 # run the server (on port 8080)
-  npm run server
+  npm run dev
+  # or better yet
+  npm run dev:nodemon
+  # which also restarts if linked packages are updated (e.g. Arranger)
 
-# if using NodeJS v17, you may have to do one of the following:
+# NOTE: if using NodeJS v17, you may have to do one of the following:
   NODE_OPTIONS=--openssl-legacy-provider npm run dev
-# or before running the server
+  # or do this, before running the server
   export NODE_OPTIONS=--openssl-legacy-provider
 ```
+
+The development server will start on port `4000` by default.
+
+#### - Documentation
+
+There is API documentation provided by Swagger, available at [/swagger](http://localhost:4000/swagger).

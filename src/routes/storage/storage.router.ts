@@ -1,16 +1,13 @@
 import { NextFunction, Request, Response, Router } from 'express';
-import urlJoin from 'url-join';
 
 import getAppConfig from '@/config/global';
-import { STORAGE_ENDPOINT } from '@/constants/endpoint';
 
 import { STORAGE_TYPES } from './constants';
 import queryRouter from './query';
 import { StorageTypes } from './types';
 import { fetchStorage, nukeStorage } from './utils';
 
-export const path = STORAGE_ENDPOINT;
-export const router: Router = Router({
+const router: Router = Router({
   mergeParams: true,
 });
 
@@ -51,6 +48,15 @@ storageRoute.all(async (req: Request, res: Response, next: NextFunction) => {
   }
 });
 
+/**
+ * @swagger
+ * /storage:
+ *  get:
+ *    responses:
+ *      200:
+ *        description: Returns all the contents stored by the user.
+ *    tags: [storage]
+ */
 storageRoute.get(async (req: Request, res: Response, next: NextFunction) => {
   try {
     const data = await fetchStorage();
@@ -61,11 +67,22 @@ storageRoute.get(async (req: Request, res: Response, next: NextFunction) => {
   }
 });
 
-// expects DELETE:`/storage/boom` and FLAG__STORAGE_ROOT_ADMIN in order to work
+/**
+ * @swagger
+ * /storage/{password}:
+ *  delete:
+ *    description: NOTE - Requires the FLAG__STORAGE_ROOT_ADMIN environment variable in order to work
+ *    responses:
+ *      200:
+ *        description: Returns the blank storage object.
+ *    tags: [storage]
+ */
+
 storageRoute.delete(async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { hasCommand, tokenBearer, userId } = res.locals;
 
+    // 'hasCommand' means the request was made to `/storage/boom` <-- password == 'boom'
     if (hasCommand) {
       const data = await nukeStorage({ tokenBearer, userId });
 
@@ -79,3 +96,5 @@ storageRoute.delete(async (req: Request, res: Response, next: NextFunction) => {
     next(error);
   }
 });
+
+export default router;
