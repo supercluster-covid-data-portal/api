@@ -55,7 +55,7 @@ COPY --from=builder \
   $APP_HOME/configs
 
 COPY --from=builder \
-  /usr/dist \
+  /usr/dist/src \
   $APP_HOME/dist
 
 COPY --from=builder \
