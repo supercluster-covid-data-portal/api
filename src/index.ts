@@ -2,7 +2,7 @@ require('dotenv').config({
   debug: process.env.NODE_ENV === 'development',
 });
 
-import Arranger from '@caravinci/arranger-server';
+import Arranger from '@overture-stack/arranger-server';
 import { Router } from 'express';
 
 import { BASE_ENDPOINT, HEALTH_ENDPOINT } from './constants/endpoint';

@@ -1,1 +1,1 @@
-declare module '@caravinci/arranger-server';
+declare module '@overture-stack/arranger-server';
