@@ -48,6 +48,15 @@ storageRoute.all(async (req: Request, res: Response, next: NextFunction) => {
   }
 });
 
+/**
+ * @swagger
+ * /storage:
+ *  get:
+ *    responses:
+ *      200:
+ *        description: Returns all the contents stored by the user.
+ *    tags: [storage]
+ */
 storageRoute.get(async (req: Request, res: Response, next: NextFunction) => {
   try {
     const data = await fetchStorage();
@@ -58,11 +67,22 @@ storageRoute.get(async (req: Request, res: Response, next: NextFunction) => {
   }
 });
 
-// expects DELETE:`/storage/boom` and FLAG__STORAGE_ROOT_ADMIN in order to work
+/**
+ * @swagger
+ * /storage/{password}:
+ *  delete:
+ *    description: NOTE - Requires the FLAG__STORAGE_ROOT_ADMIN environment variable in order to work
+ *    responses:
+ *      200:
+ *        description: Returns the blank storage object.
+ *    tags: [storage]
+ */
+
 storageRoute.delete(async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { hasCommand, tokenBearer, userId } = res.locals;
 
+    // 'hasCommand' means the request was made to `/storage/boom` <-- password == 'boom'
     if (hasCommand) {
       const data = await nukeStorage({ tokenBearer, userId });
 
