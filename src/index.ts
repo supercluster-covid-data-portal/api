@@ -2,15 +2,16 @@ require('dotenv').config({
   debug: process.env.NODE_ENV === 'development',
 });
 
-import Arranger from '@caravinci/arranger-server';
+import Arranger from '@overture-stack/arranger-server';
 import { Router } from 'express';
 
-import { BASE_ENDPOINT } from './constants/endpoint';
+import { BASE_ENDPOINT, HEALTH_ENDPOINT } from './constants/endpoint';
+import { getEsClient } from './esClient';
 import app from './server';
 
 const port = Number(process.env.PORT || 4000);
 
-Arranger().then((arrangerRouter: Router) => {
+Arranger({ pingPath: HEALTH_ENDPOINT }).then((arrangerRouter: Router) => {
   app.use(BASE_ENDPOINT, arrangerRouter);
 
   app.listen(port, () => {
@@ -22,3 +23,6 @@ Arranger().then((arrangerRouter: Router) => {
     console.info(`${line}\n`);
   });
 });
+
+// init elasticsearch
+getEsClient();

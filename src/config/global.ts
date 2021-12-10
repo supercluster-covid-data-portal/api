@@ -19,27 +19,46 @@
 
 import urlJoin from 'url-join';
 
-import { JWKS_ENDPOINT } from '../constants/endpoint';
 import logger from '../logger';
 import * as vault from './vault';
 
-interface AppConfig {
+const JWKS_URI_PATH = '/oauth/jwks';
+
+export interface AppSecrets {
+  auth: {
+    clientSecret: string;
+  };
+}
+
+export interface AppConfig {
   auth: {
     apiRootUrl: string;
     jwksUri: string;
     clientId: string;
-    clientSecret: string;
     sessionDuration: number;
     sessionTokenKey: string;
   };
   client: {
     domain: string;
   };
+  drs: {
+    objectPath: string;
+    protocol: string;
+  };
   flag: {
     storageRootAdmin: boolean;
   };
+  es: {
+    user: string;
+    password: string;
+    host: string;
+  };
+  download: {
+    sequences_limit: number;
+  };
 }
-let config: AppConfig | undefined = undefined;
+
+let appSecrets: AppSecrets | undefined = undefined;
 
 const vaultEnabled = (process.env.VAULT_ENABLED || '').toLowerCase() === 'true';
 
@@ -58,42 +77,57 @@ const loadVaultSecrets = async () => {
   }
 };
 
-const buildAppConfig = async (secrets: Record<string, any> = {}): Promise<AppConfig> => {
-  logger.info('Building app config...');
+const buildAppSecrets = async (secrets: Record<string, any> = {}): Promise<AppSecrets> => {
+  logger.info('Building app secrets...');
 
-  config = {
+  appSecrets = {
+    auth: {
+      clientSecret: secrets.AUTH_CLIENT_SECRET || process.env.AUTH_CLIENT_SECRET || '',
+    },
+  };
+  return appSecrets;
+};
+
+export const getAppSecrets = async () => {
+  if (appSecrets !== undefined) {
+    return appSecrets;
+  }
+  if (vaultEnabled) {
+    const secrets = await loadVaultSecrets();
+    return buildAppSecrets(secrets);
+  }
+  return buildAppSecrets();
+};
+
+const getAppConfig = (): AppConfig => {
+  return {
     auth: {
       apiRootUrl: process.env.AUTH_API_ROOT || '',
-      jwksUri: process.env.AUTH_API_ROOT ? urlJoin(process.env.AUTH_API_ROOT, JWKS_ENDPOINT) : '',
+      jwksUri: process.env.AUTH_API_ROOT ? urlJoin(process.env.AUTH_API_ROOT, JWKS_URI_PATH) : '',
       clientId: process.env.AUTH_CLIENT_ID || '',
-      clientSecret: secrets.AUTH_CLIENT_SECRET || process.env.AUTH_CLIENT_SECRET || '',
       sessionDuration: Number(process.env.AUTH_SESSION_DURATION) || 1800000,
       sessionTokenKey: process.env.AUTH_SESSION_TOKEN_KEY || '',
     },
     client: {
       domain: process.env.DOMAIN_ROOT_URL || 'http://localhost:3000',
     },
+    drs: {
+      objectPath: process.env.DRS_OBJECT_PATH || 'ga4gh/drs/v1/objects',
+      protocol: process.env.DRS_PROTOCOL || 'https',
+    },
     flag: {
       storageRootAdmin:
         (process.env.FLAG__STORAGE_ROOT_ADMIN || '').toLowerCase() === 'true' || false,
     },
+    es: {
+      user: process.env.ES_USER || '',
+      password: process.env.ES_PASS || '',
+      host: process.env.ES_HOST || '',
+    },
+    download: {
+      sequences_limit: Number(process.env.SEQ_FILE_DOWNLOAD_LIMIT) || 10,
+    },
   };
-
-  return config;
-};
-
-const getAppConfig = async (envFile?: string): Promise<AppConfig> => {
-  if (config != undefined) {
-    return config;
-  }
-
-  if (vaultEnabled) {
-    const secrets = await loadVaultSecrets();
-
-    return buildAppConfig(secrets);
-  }
-
-  return buildAppConfig();
 };
 
 export default getAppConfig;

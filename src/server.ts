@@ -1,14 +1,14 @@
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import express, { Express } from 'express';
+import express from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
 
-import { ARRANGER_READY_ENDPOINT, HEALTH_ENDPOINT } from './constants/endpoint';
+import { BASE_ENDPOINT, HEALTH_ENDPOINT, SWAGGER_ENDPOINT } from './constants/endpoint';
 import logger from './logger';
-import { getFilesWithKeyword } from './utils/getFilesWithKeyword';
+import apiRoutes, { healthRouter, swaggerRouter } from './routes';
 
-const app: Express = express();
+const app = express();
 
 /************************************************************************************
  *                              Basic Express Middlewares
@@ -31,7 +31,7 @@ app.use(
     skip: (req, res) => {
       // logs everything but health checks on dev, errors only otherwise
       return process.env.NODE_ENV === 'development' || process.env.DEBUG === 'true'
-        ? [ARRANGER_READY_ENDPOINT, HEALTH_ENDPOINT].includes(req.originalUrl)
+        ? req.originalUrl.includes(HEALTH_ENDPOINT)
         : res.statusCode < 400;
     },
   }),
@@ -47,13 +47,9 @@ if (process.env.NODE_ENV === 'production') {
  *                               Register all routes
  ***********************************************************************************/
 
-getFilesWithKeyword('router', __dirname + '/routes').forEach((file: string) => {
-  const { path = '/', router } = require(file);
-
-  router
-    ? app.use(path, router)
-    : console.warn(`${file} doesn't seen to export a 'router', expected at ${path}`);
-});
+app.use(BASE_ENDPOINT, apiRoutes());
+app.use(HEALTH_ENDPOINT, healthRouter);
+// app.use(SWAGGER_ENDPOINT, swaggerRouter);
 
 /************************************************************************************
  *                               Express Error Handling

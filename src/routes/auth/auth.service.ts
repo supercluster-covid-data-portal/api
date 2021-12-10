@@ -24,15 +24,16 @@ import urlJoin from 'url-join';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 
 import { TokenResponseData, WalletJwtData, WalletJwtHeaderData, WalletUser } from './types';
-import getAppConfig from '../../config/global';
+import getAppConfig, { getAppSecrets } from '../../config/global';
 import logger from '../../logger';
 import { get } from 'lodash';
+import { URL } from 'url';
 
 let kid: string;
 let pubkey: string;
 
 const fetchPublicKey: (keyId: string) => Promise<string> = async (keyId) => {
-  const config = await getAppConfig();
+  const config = getAppConfig();
   const client = JwksRsa({
     jwksUri: config.auth.jwksUri,
   });
@@ -50,7 +51,7 @@ export const validateJwt: (jwt: string) => Promise<boolean> = async (jwt) => {
 
   // if existing kid does not match incoming from jwt, update
   if (kidFromJwt !== kid) {
-    logger.info('Resetting kid from jwt...');
+    logger.debug('Resetting kid from jwt...');
     const newPubKey = await fetchPublicKey(kidFromJwt); // need error handling
     kid = kidFromJwt;
     pubkey = newPubKey;
@@ -87,15 +88,14 @@ export const extractUser: (jwtData: WalletJwtData) => WalletUser = (jwtData) => 
 export const fetchAuthToken = async (
   authCode: string,
 ): Promise<{ idToken: string; accessToken: string }> => {
-  const config = await getAppConfig();
-  const credentials = `${config.auth.clientId}:${config.auth.clientSecret}`;
+  const config = getAppConfig();
+  const secrets = await getAppSecrets();
+  const credentials = `${config.auth.clientId}:${secrets?.auth.clientSecret}`;
   const loginUrl = new URL(urlJoin(config.auth.apiRootUrl, 'oauth/token'));
   loginUrl.searchParams.append('grant_type', 'authorization_code');
   loginUrl.searchParams.append('code', authCode);
 
   const encoded = Buffer.from(credentials).toString('base64');
-
-  logger.info('Calling oauth API to get tokens');
 
   const tokenResponse: TokenResponseData = await axios
     .post(
@@ -114,7 +114,7 @@ export const fetchAuthToken = async (
       throw new Error(`Auth token response is not OK: ${res.status}`);
     })
     .catch((error: AxiosError) => {
-      logger.warn('Token fetch failed, unable to login.');
+      logger.debug('Token fetch failed, unable to login.');
       throw error;
     });
 
@@ -132,7 +132,7 @@ export const fetchAuthToken = async (
 
 // authenticated fetch for user data from userinfo endpoint
 export const fetchUserInfo = async (token: string) => {
-  const config = await getAppConfig();
+  const config = getAppConfig();
   const userResult = await axios
     .get(urlJoin(config.auth.apiRootUrl, 'api/v1/users/me'), {
       headers: {
@@ -156,7 +156,7 @@ export const fetchUserInfo = async (token: string) => {
       throw new Error('Not authenticated, cannot fetch user info');
     })
     .catch((err: AxiosError) => {
-      logger.warn('Error fetching user info');
+      logger.debug('Error fetching user info');
       return err;
     });
 

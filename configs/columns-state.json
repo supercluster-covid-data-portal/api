@@ -293,17 +293,6 @@
       "id": null,
       "field": "sample.authors",
       "accessor": "sample.authors"
-    },
-    {
-      "show": true,
-      "type": "string",
-      "sortable": true,
-      "canChangeShow": true,
-      "query": null,
-      "jsonPath": null,
-      "id": null,
-      "field": "files.drs_filepath",
-      "accessor": "files.drs_filepath"
     }
   ]
 }

@@ -6,4 +6,4 @@ logs/
 src/app/.notes
 .DS_Store
 .env
-
+.vscode*

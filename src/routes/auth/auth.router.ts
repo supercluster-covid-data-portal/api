@@ -19,14 +19,13 @@
 
 import { CookieOptions, NextFunction, Request, Response, Router } from 'express';
 import jwtDecode from 'jwt-decode';
+import { URL } from 'url';
 
 import getAppConfig from '../../config/global';
-import { AUTH_ENDPOINT } from '../../constants/endpoint';
 import logger from '../../logger';
 import { extractUser, fetchAuthToken, fetchUserInfo } from './auth.service';
 
-export const path: string = AUTH_ENDPOINT;
-export const router: Router = Router();
+const router: Router = Router();
 
 router.post('/token', async (req: Request, res: Response) => {
   try {
@@ -34,7 +33,7 @@ router.post('/token', async (req: Request, res: Response) => {
 
     if (code) {
       const tokens = await fetchAuthToken(code);
-      const config = await getAppConfig();
+      const config = getAppConfig();
       const domain = new URL(config.client.domain);
 
       const cookieConfig: CookieOptions = {
@@ -56,14 +55,16 @@ router.post('/token', async (req: Request, res: Response) => {
 
     return res.status(400).send('Missing parameters');
   } catch (error) {
-    logger.error(error);
+    if (error instanceof Error) {
+      logger.debug(`Could not retrieve token: ${error.message}`);
+    }
     return res.status(500).send('Login failed');
   }
 });
 
 router.get('/user-info', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const config = await getAppConfig();
+    const config = getAppConfig();
     const token = req.cookies[config.auth.sessionTokenKey];
 
     if (token) {
@@ -74,7 +75,11 @@ router.get('/user-info', async (req: Request, res: Response, next: NextFunction)
 
     return res.status(401).send('Please login');
   } catch (error) {
-    logger.error(error);
+    if (error instanceof Error) {
+      logger.debug(`Could not get user info: `, error);
+    }
     return next(error);
   }
 });
+
+export default router;
