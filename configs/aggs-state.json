@@ -125,12 +125,12 @@
     "show": true
   },
   {
-    "field": "date_submitted",
+    "field": "sequence_submitted_date",
     "active": true,
     "show": true
   },
   {
-    "field": "release_date",
+    "field": "sequence_release_date",
     "active": true,
     "show": true
   },
